@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from picamera import PiCamera
 from picamera.array import PiRGBArray
+import motors
 
 w, h = 600, 450
 
@@ -31,10 +32,26 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     lines = cv2.HoughLinesP(image=img_trans_canny, rho=1, theta=np.pi / 180, threshold=60, minLineLength=50,
                             maxLineGap=10)
 
+    averageLinePosition = w / 2
+    i = 0
+
+    # Finds the line in the most simplistic possible way:
+    # Look for the side of the image where more lines start and end on and move in that direction.
+    # It fails when there is a crossing of lines but on a single line with not so strong curves it works
+    # It can get optimized with PD control.
+
     if lines is not None:
         for line in lines:
             for x1, y1, x2, y2 in line:
+                averageLinePosition = averageLinePosition + (((x1 + x2) / 2) - averageLinePosition) / (i + 1)
+                print("avgline: ", averageLinePosition)
                 cv2.line(img_trans, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+        k = (w / 2 + (averageLinePosition - w)) / w / 2
+        print("k: ", k)
+        motors.set_speed_from_speed_steer(1, k)
+    else:
+        motors.set_speed_from_speed_steer(0, 0)
 
     cv2.imshow("Frame", img_trans)
     key = cv2.waitKey(1) & 0xFF
