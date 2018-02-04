@@ -5,7 +5,7 @@
       <paths name="pi">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/pi/opencv-1" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/home/pi/opencv-mazesolver" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
