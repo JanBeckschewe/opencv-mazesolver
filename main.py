@@ -5,7 +5,7 @@ import numpy as np
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 
-import lineStuff
+import linecalc
 import motors
 
 w, h = 600, 450
@@ -50,8 +50,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     if lines is not None:
         for line in lines:
             for x1, y1, x2, y2 in line:
-                print("angle: ", lineStuff.isLineHorizontal(x1, x2, y1, y2))
-                if not lineStuff.isLineHorizontal(x1, x2, y1, y2):
+                print("angle: ", linecalc.is_line_horizontal(x1, x2, y1, y2))
+                if not linecalc.is_line_horizontal(x1, x2, y1, y2):
                     averageLinePosition = averageLinePosition + (((x1 + x2) / 2) - averageLinePosition) / (i + 1)
                     cv2.line(img_warped_canny, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 else:
