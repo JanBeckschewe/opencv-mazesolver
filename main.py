@@ -8,6 +8,37 @@ from picamera.array import PiRGBArray
 import linecalc
 import motors
 
+path = []
+left, right, forward, backward = range(4)
+
+
+def simplify_maze(turn):
+    if len(path) < 3 or path[len(path) - 2] != backward:
+        return
+
+    total_angle = 0
+
+    for x in range(1, 3):
+        if path[len(path) - x] == right:
+            total_angle += 90
+        elif path[len(path) - x] == left:
+            total_angle += 270
+        elif path[len(path) - x] == backward:
+            total_angle += 180
+
+    total_angle = total_angle % 360
+    path.pop(2)
+
+    if total_angle == 0:
+        path[len(path) - 1] = forward
+    elif total_angle == 90:
+        path[len(path) - 1] = right
+    elif total_angle == 180:
+        path[len(path) - 1] = backward
+    elif total_angle == 270:
+        path[len(path) - 1] = left
+
+
 w, h = 600, 450
 
 camera = PiCamera()
@@ -39,9 +70,9 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     img_warped_canny = cv2.cvtColor(img_warped_canny, cv2.COLOR_GRAY2BGR)
 
-    # Finds the line in the most simplistic possible way:
-    # Look for the side of the image where more lines start and end on and move in that direction.
-    # ̶i̶̶t̶̶ ̶̶f̶̶a̶̶i̶̶l̶̶s̶̶ ̶̶w̶̶h̶̶e̶̶n̶̶ ̶̶t̶̶h̶̶e̶̶r̶̶e̶̶ ̶̶i̶̶s̶̶ ̶̶a̶̶ ̶̶c̶̶r̶̶o̶̶s̶̶s̶̶i̶̶n̶̶g̶̶ ̶̶o̶̶f̶̶ ̶̶l̶̶i̶̶n̶̶e̶̶s̶ but on a single line with not so strong curves it works
+    # Finds the line in the most simplistic possible way: Look for the side of the image where more lines start and
+    # end on and move in that direction. ̶i̶̶t̶̶ ̶̶f̶̶a̶̶i̶̶l̶̶s̶̶ ̶̶w̶̶h̶̶e̶̶n̶̶ ̶̶t̶̶h̶̶e̶̶r̶̶e̶̶ ̶̶i̶̶s̶̶ ̶̶a̶̶
+    # ̶̶c̶̶r̶̶o̶̶s̶̶s̶̶i̶̶n̶̶g̶̶ ̶̶o̶̶f̶̶ ̶̶l̶̶i̶̶n̶̶e̶̶s̶ but on a single line with not so strong curves it works
     # ̶i̶̶t̶̶ ̶̶c̶̶a̶̶n̶̶ ̶̶g̶̶e̶̶t̶̶ ̶̶o̶̶p̶̶t̶̶i̶̶m̶̶i̶̶z̶̶e̶̶d̶̶ ̶̶w̶̶i̶̶t̶̶h̶̶ ̶̶p̶̶d̶̶ ̶̶c̶̶o̶̶n̶̶t̶̶r̶̶o̶̶l̶̶.̶
 
     averageLinePosition = w / 2
