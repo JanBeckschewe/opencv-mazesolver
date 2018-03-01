@@ -1,5 +1,5 @@
 path = []
-left, right, forward, backward = range(4)
+forward, right, backward, left = range(4)
 
 
 def simplify_maze(turn):
