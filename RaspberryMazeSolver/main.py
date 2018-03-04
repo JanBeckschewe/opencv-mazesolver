@@ -8,13 +8,14 @@ from RaspberryMazeSolver import cv_stuff
 from RaspberryMazeSolver import linecalc
 from RaspberryMazeSolver import motors
 
-is_first_run = False
 left, right, forward, backward = range(4)
 direction = forward
 simple_path = []
 simple_path_position = 0
 path = []
 path_position = 0
+
+start = 0
 
 proportional_const, derivate_const = 0.2, 1
 last_error = 0
@@ -30,7 +31,7 @@ rawCapture = PiRGBArray(camera, size=(w, h))
 time.sleep(0.1)
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-
+    end = time.clock()
     img_canny, lines = cv_stuff.modify_image(frame)
 
     averageLinePosition = w / 2
@@ -66,13 +67,24 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     cv2.line(img_canny, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
         if is_horizontal_line_left:
-            path.append(left)
+            if end - start > 3 or start == 0:
+                path.append(left)
+                start = time.clock()
+            motor_steer = -1
 
         elif is_vertical_line and is_horizontal_line_right:
-            path.append(forward)
+            if end - start > 3 or start == 0:
+                path.append(forward)
+                start = time.clock()
+            pos_to_mid = (w / 2 + (averageLinePosition - w)) / w * 2
+            motor_steer = proportional_const * pos_to_mid + derivate_const * (pos_to_mid - last_error)
+            last_error = pos_to_mid
 
         elif is_horizontal_line_right:
-            path.append(right)
+            if end - start > 3 or start == 0:
+                path.append(right)
+                start = time.clock()
+            motor_steer = 1
 
         else:
             pos_to_mid = (w / 2 + (averageLinePosition - w)) / w * 2
