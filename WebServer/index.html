@@ -1,13 +1,21 @@
-<meta charset="utf-8">
+<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <title>OpenCV Mazesolver</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.png">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <script type="text/javascript" src="konva.min.js"></script>
 </head>
 
 <body>
-hallo
+<div id="buttons">
+    <button onclick="socket.send('start')">start</button>
+    <button onclick="socket.send('stop')">stop</button>
+</div>
 
-<div id="container"></div>
+<div id="konva_canvas">k</div>
 <script type="text/javascript" src="websocket_stuff.js"></script>
 
 </body>

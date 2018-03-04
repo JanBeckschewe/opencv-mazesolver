@@ -1,0 +1,17 @@
+#konva_canvas {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#buttons {
+    text-align: center;
+}
+
+body {
+    margin: 0;
+}
+
+button {
+    font-family: sans-serif;
+}
