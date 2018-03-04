@@ -4,7 +4,7 @@ A Raspberry Pi based robot with openCV that drives through a maze
 
 ## How to use
 ### Install requirements
-run the [install script](install.sh)
+- run the [install script](install.sh)
 ### Run the program
 - run `python -m http.server 80` inside the `WebServer` folder
 - run `python main.py` inside the `RaspberryMazeSolver` folder
@@ -12,4 +12,4 @@ run the [install script](install.sh)
 
 
 ## sources
-[calibration procedure](https://github.com/tizianofiorenzani/how_do_drones_work/tree/master/opencv)
+- [calibration procedure](https://github.com/tizianofiorenzani/how_do_drones_work/tree/master/opencv)
