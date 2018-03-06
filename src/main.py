@@ -4,9 +4,9 @@ import cv2
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 
-from RaspberryMazeSolver import cv_stuff
-from RaspberryMazeSolver import linecalc
-from RaspberryMazeSolver import motors
+import opencv
+import linecalc
+import motors
 
 left, right, forward, backward = range(4)
 direction = forward
@@ -32,7 +32,7 @@ time.sleep(0.1)
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     end = time.clock()
-    img_canny, lines = cv_stuff.modify_image(frame)
+    img_canny, lines = opencv.modify_image(frame)
 
     averageLinePosition = w / 2
     i = 0
@@ -101,6 +101,3 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
         if key == ord("q"):
             break
-
-
-

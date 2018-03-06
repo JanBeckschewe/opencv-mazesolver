@@ -1,19 +1,22 @@
 import json
 import random
+import threading
+from http import server
+from http.server import SimpleHTTPRequestHandler
 
 from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer
 
-from RaspberryMazeSolver import maze_stuff
+import maze
 
 path_dirs = [
-    maze_stuff.forward,
-    maze_stuff.forward,
-    maze_stuff.right,
-    maze_stuff.left,
-    maze_stuff.forward,
-    maze_stuff.right,
-    maze_stuff.right,
-    maze_stuff.forward
+    maze.forward,
+    maze.forward,
+    maze.right,
+    maze.left,
+    maze.forward,
+    maze.right,
+    maze.right,
+    maze.forward
 ]
 path = []
 
@@ -43,6 +46,14 @@ class SocketHandler(WebSocket):
         self.sendMessage(json.dumps(path))
 
 
-server = SimpleWebSocketServer("0.0.0.0", 8000, SocketHandler)
+# not sure if I'm gonna keep that because right now it serves from the sources root directory
+def run_http_server():
+    server.test(HandlerClass=SimpleHTTPRequestHandler, port=80)
 
-server.serveforever()
+
+ws_server = SimpleWebSocketServer("0.0.0.0", 8000, SocketHandler)
+
+threading.Thread(target=ws_server.serveforever).start()
+threading.Thread(target=run_http_server).start()
+
+print("not serving anymore")

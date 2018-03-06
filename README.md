@@ -6,9 +6,8 @@ A Raspberry Pi based robot with openCV that drives through a maze
 ### Install requirements
 - run the [install script](INSTALL.sh)
 ### Run the program
-- run `python -m http.server 80` inside the `WebServer` folder
-- run `python main.py` inside the `RaspberryMazeSolver` folder
-- open your pi's IP adress inside your favourite web browser
+- run `python main.py` inside the `src` folder
+- open your pi's IP adress inside your web browser
 
 
 ## sources
