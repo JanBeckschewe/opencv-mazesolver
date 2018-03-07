@@ -12,28 +12,32 @@ def add_turn(turn):
     server.send_path()
 
 
-def simplify_maze(turn):
-    if len(path) < 3 or path[len(path) - 2] != backward:
+def simplify_maze():
+    if len(path) < 3 or path[len(path) - 2][0] != backward:
         return
 
     total_angle = 0
 
-    for x in range(1, 3):
-        if path[len(path) - x] == right:
+    for x in range(1, 4):
+        if path[len(path) - x][0] == right:
             total_angle += 90
-        elif path[len(path) - x] == left:
+        elif path[len(path) - x][0] == left:
             total_angle += 270
-        elif path[len(path) - x] == backward:
+        elif path[len(path) - x][0] == backward:
             total_angle += 180
 
     total_angle = total_angle % 360
-    path.pop(2)
+
+    for x in range(3):
+        path.pop()
 
     if total_angle == 0:
-        path[len(path) - 1] = forward
+        path.append([forward, 0])
     elif total_angle == 90:
-        path[len(path) - 1] = right
+        path.append([right, 0])
     elif total_angle == 180:
-        path[len(path) - 1] = backward
+        path.append([backward, 0])
     elif total_angle == 270:
-        path[len(path) - 1] = left
+        path.append([left, 0])
+
+    print(path)
