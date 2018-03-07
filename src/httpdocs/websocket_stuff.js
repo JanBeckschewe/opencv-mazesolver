@@ -25,11 +25,9 @@ socket.onopen = function (ev) {
     console.log("connected");
 };
 socket.onmessage = function (ev) {
-    console.log("received");
     path = JSON.parse(ev.data);
     console.log(path);
     draw();
-    socket.send("k");
 };
 
 window.addEventListener('resize', function (ev) {
@@ -41,6 +39,11 @@ window.addEventListener('resize', function (ev) {
 function draw() {
     var currentDir = right;
     var posPixel = {x: 0, y: 0};
+
+    points.length = 0;
+    path_line.scale({x: 1, y: 1});
+    path_line.offsetX(0);
+    path_line.offsetY(0);
 
     path.forEach(function (element) {
         currentDir = (currentDir + element[0]) % 4;
@@ -61,13 +64,10 @@ function draw() {
     });
 
     var pathBoundsRect = path_line.getClientRect();
-    console.log(pathBoundsRect);
-    console.log("w,h", stage.width(), stage.height());
     path_line.offsetX(pathBoundsRect.x);
     path_line.offsetY(pathBoundsRect.y);
 
     var scalingFactor = Math.min(stage.width() / pathBoundsRect.width, stage.height() / pathBoundsRect.height);
-    console.log("scalingFactor", scalingFactor);
 
     path_line.scale({x: scalingFactor, y: scalingFactor});
 
