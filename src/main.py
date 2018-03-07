@@ -4,16 +4,10 @@ import cv2
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 
-import opencv
 import linecalc
+import maze
 import motors
-
-left, right, forward, backward = range(4)
-direction = forward
-simple_path = []
-simple_path_position = 0
-path = []
-path_position = 0
+import opencv
 
 start = 0
 
@@ -36,14 +30,12 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     averageLinePosition = w / 2
     i = 0
-    # noinspection PyRedeclaration
     is_horizontal_line_right = False
     is_horizontal_line_left = False
-    # noinspection PyRedeclaration
     is_vertical_line = False
 
     if lines is None:
-        path.append(backward)
+        maze.add_turn(maze.backward)
     else:
         for line in lines:
             for x1, y1, x2, y2 in line:
@@ -68,13 +60,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
         if is_horizontal_line_left:
             if end - start > 3 or start == 0:
-                path.append(left)
+                maze.add_turn(maze.left)
                 start = time.clock()
             motor_steer = -1
 
         elif is_vertical_line and is_horizontal_line_right:
             if end - start > 3 or start == 0:
-                path.append(forward)
+                maze.add_turn(maze.forward)
                 start = time.clock()
             pos_to_mid = (w / 2 + (averageLinePosition - w)) / w * 2
             motor_steer = proportional_const * pos_to_mid + derivate_const * (pos_to_mid - last_error)
@@ -82,7 +74,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
         elif is_horizontal_line_right:
             if end - start > 3 or start == 0:
-                path.append(right)
+                maze.add_turn(maze.right)
                 start = time.clock()
             motor_steer = 1
 

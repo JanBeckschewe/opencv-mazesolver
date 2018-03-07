@@ -1,5 +1,15 @@
-path = []
+import server
+
 forward, right, backward, left = range(4)
+path = []
+path_position = 0
+simple_path = []
+simple_path_position = 0
+
+
+def add_turn(turn):
+    path.append([turn, 100])
+    server.send_path()
 
 
 def simplify_maze(turn):

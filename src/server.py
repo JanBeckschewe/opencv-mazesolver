@@ -1,28 +1,13 @@
 import json
 import random
 import threading
-from http import server
-from http.server import SimpleHTTPRequestHandler
 
+import time
 from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer
 
 import maze
 
-path_dirs = [
-    maze.forward,
-    maze.forward,
-    maze.right,
-    maze.left,
-    maze.forward,
-    maze.right,
-    maze.right,
-    maze.forward
-]
-path = []
-
-# random path with the first parameter being the directions and the second the time in milliseconds
-for i in range(len(path_dirs) * 10):
-    path.append([path_dirs[i % len(path_dirs)], random.randint(0, 300)])
+clients = []
 
 
 class SocketHandler(WebSocket):
@@ -35,19 +20,27 @@ class SocketHandler(WebSocket):
             print("start")
 
     def handleConnected(self):
-        print("connected")
-        self.send_path()
+        clients.append(self)
+        send_path()
 
     def handleClose(self):
-        pass
+        clients.remove(self)
 
-    def send_path(self):
-        path.append([random.randint(0, 3), random.randint(0, 300)])
-        self.sendMessage(json.dumps(path))
+
+def send_path():
+    for client in clients:
+        client.sendMessage(json.dumps(maze.path))
+
+
+def continually_append_random_turn():
+    while True:
+        maze.add_turn(random.randint(0, 3))
+        time.sleep(3)
 
 
 ws_server = SimpleWebSocketServer("0.0.0.0", 8000, SocketHandler)
 
 threading.Thread(target=ws_server.serveforever).start()
 
-print("not serving anymore")
+if __name__ == "__main__":
+    threading.Thread(target=continually_append_random_turn()).start()
