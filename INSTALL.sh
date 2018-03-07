@@ -8,4 +8,6 @@ conda install -c conda-forge opencv
 pip install pyyaml
 pip install git+https://github.com/dpallot/simple-websocket-server.git
 
+sudo apt-get install apache2
+
 echo 'all done.'

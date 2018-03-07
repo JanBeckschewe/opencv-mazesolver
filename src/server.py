@@ -46,14 +46,8 @@ class SocketHandler(WebSocket):
         self.sendMessage(json.dumps(path))
 
 
-# not sure if I'm gonna keep that because right now it serves from the sources root directory
-def run_http_server():
-    server.test(HandlerClass=SimpleHTTPRequestHandler, port=80)
-
-
 ws_server = SimpleWebSocketServer("0.0.0.0", 8000, SocketHandler)
 
 threading.Thread(target=ws_server.serveforever).start()
-threading.Thread(target=run_http_server).start()
 
 print("not serving anymore")
