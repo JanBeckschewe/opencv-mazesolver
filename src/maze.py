@@ -11,13 +11,15 @@ simple_path_position = 0
 
 def add_turn(turn):
     full_path.append([turn, random.randint(50, 150)])
+    set_simplified_path()
     server.send_path()
 
 
-def get_simplified_maze():
+def set_simplified_path():
     tmp_path = list(full_path)
+
     if len(tmp_path) < 3 or tmp_path[len(tmp_path) - 2][0] != backward:
-        return tmp_path
+        return
 
     total_angle = 0
 
@@ -43,4 +45,5 @@ def get_simplified_maze():
     elif total_angle == 270:
         tmp_path.append([left, 0])
 
-    return tmp_path
+    simple_path.clear()
+    simple_path.extend(tmp_path)

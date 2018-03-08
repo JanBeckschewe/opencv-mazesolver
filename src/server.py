@@ -31,7 +31,7 @@ def send_path():
     print("send")
     json_object = {
         "full_path": maze.full_path,
-        "simple_path": maze.get_simplified_maze(),
+        "simple_path": maze.simple_path,
         "path_position": maze.full_path_position
     }
     for client in clients:
