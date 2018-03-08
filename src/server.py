@@ -28,19 +28,22 @@ class SocketHandler(WebSocket):
 
 
 def send_path():
+    print("send")
+    json_object = {
+        "path": maze.path,
+        "simple_path": maze.simple_path,
+        "path_position": maze.path_position
+    }
     for client in clients:
-        client.sendMessage(json.dumps(maze.path))
+        client.sendMessage(json.dumps(json_object))
 
 
 def continually_append_random_turn():
     while True:
         maze.add_turn(random.randint(0, 3))
-        time.sleep(3)
+        time.sleep(.01)
 
 
 ws_server = SimpleWebSocketServer("0.0.0.0", 8000, SocketHandler)
 
 threading.Thread(target=ws_server.serveforever).start()
-
-if __name__ == "__main__":
-    threading.Thread(target=continually_append_random_turn()).start()

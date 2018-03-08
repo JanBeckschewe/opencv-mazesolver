@@ -24,9 +24,12 @@ var socket = new WebSocket('ws://' + window.location.hostname + ':8000');
 socket.onopen = function (ev) {
     console.log("connected");
 };
+
+var k;
 socket.onmessage = function (ev) {
-    path = JSON.parse(ev.data);
-    console.log(path);
+    var obj = JSON.parse(ev.data);
+    path = obj.path;
+    console.log(obj);
     draw();
 };
 
