@@ -1,6 +1,8 @@
 var forward = 0, right = 1, backward = 2, left = 3;
-var path = [];
-var points = [];
+var fullPath = [];
+var konvaFullPoints = [];
+var simplePath = [];
+var konvaSimplePoints = [];
 
 var stage = new Konva.Stage({
     container: 'konva_canvas',
@@ -12,23 +14,31 @@ var stage = new Konva.Stage({
 var layer = new Konva.Layer({});
 stage.add(layer);
 
-var path_line = new Konva.Line({
-    points: points,
+var konvaFullPathLine = new Konva.Line({
+    points: konvaFullPoints,
     stroke: 'red',
     strokeWidth: 10,
     closed: false
 });
-layer.add(path_line);
+var konvaSimplePathLine = new Konva.Line({
+    points: konvaSimplePoints,
+    stroke: 'green',
+    strokeWidth: 6,
+    closed: false
+});
+layer.add(konvaFullPathLine);
+layer.add(konvaSimplePathLine);
 
 var socket = new WebSocket('ws://' + window.location.hostname + ':8000');
 socket.onopen = function (ev) {
     console.log("connected");
 };
 
-var k;
+var obj;
 socket.onmessage = function (ev) {
-    var obj = JSON.parse(ev.data);
-    path = obj.path;
+    obj = JSON.parse(ev.data);
+    fullPath = obj.full_path;
+    simplePath = obj.simple_path;
     console.log(obj);
     draw();
 };
@@ -40,14 +50,32 @@ window.addEventListener('resize', function (ev) {
 });
 
 function draw() {
+    setLinePoints(fullPath, konvaFullPoints, konvaFullPathLine);
+    setLinePoints(simplePath, konvaSimplePoints, konvaSimplePathLine);
+
+    var pathBoundsRect = konvaFullPathLine.getClientRect();
+    konvaFullPathLine.offsetX(pathBoundsRect.x);
+    konvaFullPathLine.offsetY(pathBoundsRect.y);
+    konvaSimplePathLine.offsetX(pathBoundsRect.x);
+    konvaSimplePathLine.offsetY(pathBoundsRect.y);
+
+
+    var scalingFactor = Math.min(stage.width() / pathBoundsRect.width, stage.height() / pathBoundsRect.height);
+
+    konvaFullPathLine.scale({x: scalingFactor, y: scalingFactor});
+    konvaSimplePathLine.scale({x: scalingFactor, y: scalingFactor});
+
+    layer.draw();
+}
+
+function setLinePoints(path, konvaPoints, konvaLine) {
+    konvaPoints.length = 0;
+    konvaLine.scale({x: 1, y: 1});
+    konvaLine.offsetX(0);
+    konvaLine.offsetY(0);
+
     var currentDir = right;
     var posPixel = {x: 0, y: 0};
-
-    points.length = 0;
-    path_line.scale({x: 1, y: 1});
-    path_line.offsetX(0);
-    path_line.offsetY(0);
-
     path.forEach(function (element) {
         currentDir = (currentDir + element[0]) % 4;
 
@@ -63,16 +91,6 @@ function draw() {
         else if (currentDir === backward) {
             posPixel.y += element[1];
         }
-        points.push(posPixel.x, posPixel.y);
+        konvaPoints.push(posPixel.x, posPixel.y);
     });
-
-    var pathBoundsRect = path_line.getClientRect();
-    path_line.offsetX(pathBoundsRect.x);
-    path_line.offsetY(pathBoundsRect.y);
-
-    var scalingFactor = Math.min(stage.width() / pathBoundsRect.width, stage.height() / pathBoundsRect.height);
-
-    path_line.scale({x: scalingFactor, y: scalingFactor});
-
-    layer.draw();
 }

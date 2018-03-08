@@ -30,9 +30,9 @@ class SocketHandler(WebSocket):
 def send_path():
     print("send")
     json_object = {
-        "path": maze.path,
-        "simple_path": maze.simple_path,
-        "path_position": maze.path_position
+        "full_path": maze.full_path,
+        "simple_path": maze.get_simplified_maze(),
+        "path_position": maze.full_path_position
     }
     for client in clients:
         client.sendMessage(json.dumps(json_object))
@@ -41,7 +41,7 @@ def send_path():
 def continually_append_random_turn():
     while True:
         maze.add_turn(random.randint(0, 3))
-        time.sleep(.01)
+        time.sleep(1)
 
 
 ws_server = SimpleWebSocketServer("0.0.0.0", 8000, SocketHandler)
