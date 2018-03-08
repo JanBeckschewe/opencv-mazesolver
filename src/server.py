@@ -39,8 +39,10 @@ def send_path():
 
 
 def continually_append_random_turn():
-    while True:
-        maze.add_turn(random.randint(0, 3))
+    for i in range(len(maze.path_dirs)):
+        maze.add_turn(maze.path_dirs[i])
+    # while True:
+    #     maze.add_turn(random.randint(0, 3))
         time.sleep(1)
 
 

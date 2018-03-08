@@ -3,6 +3,10 @@ import random
 import server
 
 forward, right, backward, left = range(4)
+
+path_dirs = [left, left, left, backward, left, left, left, right, backward, left, left, backward, forward, right,
+             forward, right, forward]
+
 full_path = []
 full_path_position = 0
 simple_path = []
@@ -10,7 +14,7 @@ simple_path_position = 0
 
 
 def add_turn(turn):
-    full_path.append([turn, random.randint(50, 150)])
+    full_path.append([turn, random.randint(149, 150)])
     set_simplified_path()
     server.send_path()
 

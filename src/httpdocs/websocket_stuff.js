@@ -26,8 +26,24 @@ var konvaSimplePathLine = new Konva.Line({
     strokeWidth: 6,
     closed: false
 });
+var konvaFullStartPoint = new Konva.Circle({
+    x: 0,
+    y: 0,
+    radius: 50,
+    fill: 'blue'
+});
+var konvaFullEndPoint = new Konva.Circle({
+    x: 0,
+    y: 0,
+    radius: 50,
+    fill: 'yellow'
+});
+
+
 layer.add(konvaFullPathLine);
 layer.add(konvaSimplePathLine);
+layer.add(konvaFullStartPoint);
+layer.add(konvaFullEndPoint);
 
 var socket = new WebSocket('ws://' + window.location.hostname + ':8000');
 socket.onopen = function (ev) {
@@ -50,29 +66,28 @@ window.addEventListener('resize', function (ev) {
 });
 
 function draw() {
-    setLinePoints(fullPath, konvaFullPoints, konvaFullPathLine);
-    setLinePoints(simplePath, konvaSimplePoints, konvaSimplePathLine);
+    layer.offset({x: 0, y: 0});
+    layer.scale({x: 1, y: 1});
+
+    setLinePoints(fullPath, konvaFullPoints);
+    setLinePoints(simplePath, konvaSimplePoints);
+
+    console.log(konvaFullPoints[konvaFullPoints.length - 2]);
+    // konvaFullEndPoint.x(konvaFullPoints[konvaFullPoints.length - 2]);
+    // konvaFullEndPoint.y(konvaFullPoints[konvaFullPoints.length] - 1);
 
     var pathBoundsRect = konvaFullPathLine.getClientRect();
-    konvaFullPathLine.offsetX(pathBoundsRect.x);
-    konvaFullPathLine.offsetY(pathBoundsRect.y);
-    konvaSimplePathLine.offsetX(pathBoundsRect.x);
-    konvaSimplePathLine.offsetY(pathBoundsRect.y);
-
+    layer.offset({x: pathBoundsRect.x, y: pathBoundsRect.y});
 
     var scalingFactor = Math.min(stage.width() / pathBoundsRect.width, stage.height() / pathBoundsRect.height);
 
-    konvaFullPathLine.scale({x: scalingFactor, y: scalingFactor});
-    konvaSimplePathLine.scale({x: scalingFactor, y: scalingFactor});
+    layer.scale({x: scalingFactor, y: scalingFactor});
 
     layer.draw();
 }
 
-function setLinePoints(path, konvaPoints, konvaLine) {
+function setLinePoints(path, konvaPoints) {
     konvaPoints.length = 0;
-    konvaLine.scale({x: 1, y: 1});
-    konvaLine.offsetX(0);
-    konvaLine.offsetY(0);
 
     var currentDir = right;
     var posPixel = {x: 0, y: 0};
