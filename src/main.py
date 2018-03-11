@@ -35,8 +35,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     is_horizontal_line_left = False
     is_vertical_line = False
 
+    motor_steer = 0
+
     if lines is None:
-        maze.add_turn(maze.backward)
+        if maze.full_path[-1] != maze.backward:
+            maze.add_turn(maze.backward)
+        motors.set_speed(0, 0)
+        print("0")
     else:
         for line in lines:
             for x1, y1, x2, y2 in line:
@@ -87,10 +92,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         print(motor_steer)
         motors.set_speed_from_speed_steer(.35, motor_steer)
 
-        cv2.imshow("Frame", img_canny)
-        key = cv2.waitKey(1) & 0xFF
+    cv2.imshow("Frame", img_canny)
+    key = cv2.waitKey(1) & 0xFF
 
-        rawCapture.truncate(0)
+    rawCapture.truncate(0)
 
-        if key == ord("q"):
-            break
+    if key == ord("q"):
+        break
