@@ -18,9 +18,9 @@ def modify_image(frame):
     img_blurred = cv2.GaussianBlur(img_gray, (15, 15), 0)
     img_sharpened = cv2.addWeighted(img_gray, 1.5, img_blurred, -0.5, 0)
 
-    img_canny = cv2.Canny(img_sharpened, 50, 80)
+    img_canny = cv2.Canny(img_sharpened, 130, 190)
 
-    lines = cv2.HoughLinesP(image=img_canny, rho=1, theta=np.pi / 180, threshold=20, minLineLength=50,
+    lines = cv2.HoughLinesP(image=img_canny, rho=1, theta=np.pi / 180, threshold=20, minLineLength=30,
                             maxLineGap=10)
 
     img_canny = cv2.cvtColor(img_canny, cv2.COLOR_GRAY2BGR)

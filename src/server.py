@@ -28,7 +28,7 @@ class SocketHandler(WebSocket):
 
 
 def send_path():
-    print("send")
+    print(maze.full_path[-1])
     json_object = {
         "full_path": maze.full_path,
         "simple_path": maze.simple_path,
