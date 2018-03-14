@@ -23,5 +23,9 @@ def modify_image(frame):
     lines = cv2.HoughLinesP(image=img_canny, rho=1, theta=np.pi / 180, threshold=20, minLineLength=30,
                             maxLineGap=10)
 
-    img_canny = cv2.cvtColor(img_canny, cv2.COLOR_GRAY2BGR)
-    return img_canny, lines
+    num_black_pixels = img_sharpened.size - cv2.countNonZero(img_sharpened)
+
+    img_sharpened = cv2.cvtColor(img_sharpened, cv2.COLOR_GRAY2BGR)
+    # img_canny = cv2.cvtColor(img_canny, cv2.COLOR_GRAY2BGR)
+
+    return img_sharpened, lines, num_black_pixels

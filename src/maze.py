@@ -2,6 +2,8 @@ import random
 
 import server
 
+is_paused = False
+
 forward, right, backward, left = range(4)
 
 path_dirs = [left, left, left, backward, left, left, left, right, backward, left, left, backward, forward, right,

@@ -14,10 +14,14 @@ class SocketHandler(WebSocket):
     i = 0
 
     def handleMessage(self):
-        if self.data == "stop":
-            print("stop")
+        if self.data == "pause":
+            maze.is_paused = True
         elif self.data == "start":
-            print("start")
+            maze.is_paused = False
+        elif self.data == "reset":
+            maze.full_path.clear()
+            maze.simple_path.clear()
+            send_path()
 
     def handleConnected(self):
         clients.append(self)

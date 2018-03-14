@@ -24,88 +24,81 @@ rawCapture = PiRGBArray(camera, size=(w, h))
 
 time.sleep(0.1)
 
-is_in_backwards_turn = False
-is_in_left_turn = False
-is_in_right_turn = False
-is_seeing_right_turn = False
+is_finished = False
+
+saw_right_turn_last_frame = False
+
+current_direction = maze.forward
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
-    img_canny, lines = opencv.modify_image(frame)
+    img_canny, lines, num_black_pixels = opencv.modify_image(frame)
 
     averageLinePosition = w / 2
     i = 0
-    is_horizontal_line_right = False
-    is_horizontal_line_left = False
-    is_vertical_line = False
+
+    are_turns_seen_rn = [False] * 4
 
     motor_steer = 0
 
-    if lines is None:
-        if not is_in_backwards_turn:
-            maze.add_turn(maze.backward)
-        motor_steer = 1
-        is_in_backwards_turn = True
-    else:
-        for line in lines:
-            for x1, y1, x2, y2 in line:
-                averageLinePosition += (((x1 + x2) / 2) - averageLinePosition) / (i + 1)
+    if not maze.is_paused:
 
-                if not linecalc.is_line_horizontal(x1, y1, x2, y2):
-                    is_vertical_line = True
-                    # green
-                    cv2.line(img_canny, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        if is_finished and len(maze.full_path) == 0:
+            is_finished = False
 
-                else:
-                    if linecalc.contains_line_bottom_left(x1, y1, x2, y2, h, w):
-                        is_horizontal_line_left = True
-                        # blue
-                        cv2.line(img_canny, (x1, y1), (x2, y2), (255, 0, 0), 2)
+        if not is_finished and num_black_pixels > w * h * .35:
+            is_finished = True
+            print("is finished")
 
-                    if linecalc.contains_line_bottom_right(x1, y1, x2, y2, h, w):
-                        is_horizontal_line_right = True
-                        # red
-                        cv2.line(img_canny, (x1, y1), (x2, y2), (0, 0, 255), 2)
-
-        k = 0
-        if is_in_backwards_turn:
-            k += 1
-            print("is_in_backwards_turn")
-        if is_in_right_turn:
-            k += 1
-            print("is_in_right_turn")
-        if is_in_left_turn:
-            k += 1
-            print("is_in_left_turn")
-
-        if k > 1:
-            print("alert")
-
-        if is_in_backwards_turn:
+        if is_finished:
+            pass
+        elif lines is None:
+            if not current_direction == maze.backward:
+                maze.add_turn(maze.backward)
             motor_steer = 1
-            if is_vertical_line:
-                is_in_backwards_turn = False
-            elif is_horizontal_line_left:
-                motor_steer = -1
+            current_direction = maze.backward
+        else:
+            for line in lines:
+                for x1, y1, x2, y2 in line:
+                    averageLinePosition += (((x1 + x2) / 2) - averageLinePosition) / (i + 1)
 
-        if not is_in_backwards_turn:
-            if is_in_left_turn and is_vertical_line:
-                is_in_left_turn = False
+                    if not linecalc.is_line_horizontal(x1, y1, x2, y2):
+                        are_turns_seen_rn[maze.forward] = True
+                        # green
+                        cv2.line(img_canny, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-            if is_in_right_turn and is_vertical_line:
-                is_in_right_turn = False
+                    else:
+                        if linecalc.contains_line_bottom_left(x1, y1, x2, y2, h, w):
+                            are_turns_seen_rn[maze.left] = True
+                            # blue
+                            cv2.line(img_canny, (x1, y1), (x2, y2), (255, 0, 0), 2)
 
-            if is_horizontal_line_left:
-                if not is_in_left_turn:
+                        if linecalc.contains_line_bottom_right(x1, y1, x2, y2, h, w):
+                            are_turns_seen_rn[maze.right] = True
+                            # red
+                            cv2.line(img_canny, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+            if current_direction == maze.backward:
+                motor_steer = 1
+                if are_turns_seen_rn[maze.forward]:
+                    current_direction = maze.forward
+                elif are_turns_seen_rn[maze.left]:
+                    motor_steer = -1
+
+            if (current_direction == maze.right or current_direction == maze.right) and are_turns_seen_rn[maze.forward]:
+                current_direction = maze.forward
+
+            if are_turns_seen_rn[maze.left]:
+                if not current_direction == maze.left:
                     maze.add_turn(maze.left)
-                    is_in_left_turn = True
+                    current_direction = maze.left
                 motor_steer = -1
 
-            elif is_vertical_line:
-                if is_horizontal_line_right:
-                    if not is_seeing_right_turn:
+            elif are_turns_seen_rn[maze.forward]:
+                if are_turns_seen_rn[maze.right]:
+                    if not saw_right_turn_last_frame:
                         maze.add_turn(maze.forward)
-                        is_seeing_right_turn = True
+                        current_direction = maze.forward
 
                 pos_to_mid = (w / 2 + (averageLinePosition - w)) / w * 2
 
@@ -125,16 +118,22 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 # last_error = pos_to_mid
                 # last_time = current_time
 
-            elif is_horizontal_line_right:
-                if not is_in_right_turn:
+            elif are_turns_seen_rn[maze.right]:
+                if not current_direction == maze.right:
                     maze.add_turn(maze.right)
-                    is_in_right_turn = True
+                    current_direction = maze.right
                 motor_steer = 1
             else:
-                print("this should never happen, something is wrong")
+                print("the line was lost")
 
-        print(motor_steer)
-        motors.set_speed_from_speed_steer(.4, motor_steer)
+            if not are_turns_seen_rn[maze.right]:
+                saw_right_turn_last_frame = False
+
+        motors.set_speed_from_speed_steer(0 if is_finished else .4, motor_steer)
+
+    else:
+        motors.set_speed(0, 0)
+        print("paused")
 
     cv2.imshow("Frame", img_canny)
     key = cv2.waitKey(1) & 0xFF
