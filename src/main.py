@@ -62,6 +62,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 for x1, y1, x2, y2 in line:
                     averageLinePosition += (((x1 + x2) / 2) - averageLinePosition) / (i + 1)
 
+                    # TODO we need to check the bottom part aswell because otherwise it will e.g. go right
+                    # TODO although there might be a left in the upper half of the image
                     if not linecalc.is_line_horizontal(x1, y1, x2, y2):
                         are_turns_seen_rn[maze.forward] = True
                         # green
@@ -85,6 +87,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 elif are_turns_seen_rn[maze.left]:
                     motor_steer = -1
 
+            # TODO fix that shit
             if (current_direction == maze.right or current_direction == maze.right) and are_turns_seen_rn[maze.forward]:
                 current_direction = maze.forward
 
