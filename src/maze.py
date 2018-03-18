@@ -6,8 +6,7 @@ is_paused = False
 
 forward, right, backward, left = range(4)
 
-path_dirs = [left, left, left, backward, left, left, left, right, backward, left, left, backward, forward, right,
-             forward, right, forward]
+path_dirs = [forward, right, left, backward, right]
 
 full_path = []
 full_path_position = 0
@@ -16,7 +15,7 @@ simple_path_position = 0
 
 
 def add_turn(turn):
-    turn_with_time = [turn, random.randint(149, 150)]
+    turn_with_time = [turn, random.randint(50, 150)]
     full_path.append(turn_with_time)
     simple_path.append(turn_with_time)
     simplify_path()
@@ -24,29 +23,19 @@ def add_turn(turn):
 
 
 def simplify_path():
-    if len(simple_path) < 3 or simple_path[len(simple_path) - 2][0] != backward:
+    if len(simple_path) < 3 or simple_path[-2][0] != backward:
         return
 
     total_angle = 0
 
     for x in range(1, 4):
-        if simple_path[len(simple_path) - x][0] == right:
-            total_angle += 90
-        elif simple_path[len(simple_path) - x][0] == left:
-            total_angle += 270
-        elif simple_path[len(simple_path) - x][0] == backward:
-            total_angle += 180
+        total_angle += simple_path[-x][0]
 
-    total_angle = total_angle % 360
+    new_turn = total_angle % 4
+
+    length = simple_path[-1][1]
 
     for x in range(3):
         simple_path.pop()
 
-    if total_angle == 0:
-        simple_path.append([forward, 0])
-    elif total_angle == 90:
-        simple_path.append([right, 0])
-    elif total_angle == 180:
-        simple_path.append([backward, 0])
-    elif total_angle == 270:
-        simple_path.append([left, 0])
+    simple_path.append([new_turn, length])

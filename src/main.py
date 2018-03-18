@@ -87,8 +87,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 elif are_turns_seen_rn[maze.left]:
                     motor_steer = -1
 
-            # TODO fix that shit
-            if (current_direction == maze.right or current_direction == maze.right) and are_turns_seen_rn[maze.forward]:
+            # TODO I think this should work but I'm not sure, please test this
+            if ((current_direction == maze.right and not are_turns_seen_rn[maze.right]) \
+                        or (current_direction == maze.right and not are_turns_seen_rn[maze.left])) \
+                    and are_turns_seen_rn[maze.forward]:
                 current_direction = maze.forward
 
             if are_turns_seen_rn[maze.left]:

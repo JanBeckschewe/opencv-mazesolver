@@ -29,14 +29,21 @@ var konvaSimplePathLine = new Konva.Line({
 var konvaFullStartPoint = new Konva.Circle({
     x: 0,
     y: 0,
-    radius: 50,
+    radius: 10,
     fill: 'blue'
 });
 var konvaFullEndPoint = new Konva.Circle({
     x: 0,
     y: 0,
-    radius: 50,
+    radius: 10,
     fill: 'yellow'
+});
+// TODO should be the same as fullEndPoint, only for testing
+var konvaSimpleEndPoint = new Konva.Circle({
+    x: 0,
+    y: 0,
+    radius: 10,
+    fill: 'orange'
 });
 
 
@@ -44,6 +51,8 @@ layer.add(konvaFullPathLine);
 layer.add(konvaSimplePathLine);
 layer.add(konvaFullStartPoint);
 layer.add(konvaFullEndPoint);
+// TODO .
+layer.add(konvaSimpleEndPoint);
 
 var socket = new WebSocket('ws://' + window.location.hostname + ':8000');
 socket.onopen = function (ev) {
@@ -72,9 +81,12 @@ function draw() {
     setLinePoints(fullPath, konvaFullPoints);
     setLinePoints(simplePath, konvaSimplePoints);
 
-    console.log(konvaFullPoints[konvaFullPoints.length - 2]);
-    // konvaFullEndPoint.x(konvaFullPoints[konvaFullPoints.length - 2]);
-    // konvaFullEndPoint.y(konvaFullPoints[konvaFullPoints.length] - 1);
+    konvaFullEndPoint.x(konvaFullPoints[konvaFullPoints.length - 2]);
+    konvaFullEndPoint.y(konvaFullPoints[konvaFullPoints.length - 1]);
+
+    // TODO .
+    konvaSimpleEndPoint.x(konvaSimplePoints[konvaSimplePoints.length - 2]);
+    konvaSimpleEndPoint.y(konvaSimplePoints[konvaSimplePoints.length - 1]);
 
     var pathBoundsRect = konvaFullPathLine.getClientRect();
     layer.offset({x: pathBoundsRect.x, y: pathBoundsRect.y});
@@ -91,6 +103,7 @@ function setLinePoints(path, konvaPoints) {
 
     var currentDir = right;
     var posPixel = {x: 0, y: 0};
+    konvaPoints.push(0, 0);
     path.forEach(function (element) {
         currentDir = (currentDir + element[0]) % 4;
 
