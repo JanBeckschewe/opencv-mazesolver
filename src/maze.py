@@ -6,7 +6,7 @@ is_paused = False
 
 forward, right, backward, left = range(4)
 
-path_dirs = [forward, right, left, backward, right]
+path_dirs = [forward, right, left, backward, left]
 
 full_path = []
 full_path_position = 0

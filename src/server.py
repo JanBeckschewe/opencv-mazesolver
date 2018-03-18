@@ -11,7 +11,6 @@ clients = []
 
 
 class SocketHandler(WebSocket):
-    i = 0
 
     def handleMessage(self):
         if self.data == "pause":
