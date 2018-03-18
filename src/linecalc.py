@@ -2,9 +2,7 @@ import math
 
 
 def is_line_horizontal(x1, y1, x2, y2):
-    # https://www.mathebibel.de/steigungswinkel
-    angle = math.atan2(y2 - y1, x2 - x1) * 180.0 / math.pi
-    return -45 < angle < 45 or 135 < angle < 180 or -180 < angle < -135
+    return abs(x2 - x1) > abs(y2 - y1)
 
 
 def contains_line_bottom_left(x1, y1, x2, y2, h, w):

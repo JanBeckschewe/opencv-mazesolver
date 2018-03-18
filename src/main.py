@@ -35,7 +35,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     img_canny, lines, num_black_pixels = opencv.modify_image(frame)
 
     averageLinePosition = w / 2
-    i = 0
 
     are_turns_seen_rn = [False] * 4
 
@@ -58,6 +57,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             motor_steer = 1
             current_direction = maze.backward
         else:
+            i = 0
             for line in lines:
                 for x1, y1, x2, y2 in line:
                     averageLinePosition += (((x1 + x2) / 2) - averageLinePosition) / (i + 1)
@@ -124,7 +124,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     current_direction = maze.right
                 motor_steer = 1
             else:
-                print("the line was lost")
+                print("something went wrong")
 
             if not are_turns_seen_rn[maze.right]:
                 saw_right_turn_last_frame = False

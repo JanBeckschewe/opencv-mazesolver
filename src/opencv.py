@@ -20,8 +20,7 @@ def modify_image(frame):
 
     img_canny = cv2.Canny(img_sharpened, 130, 190)
 
-    lines = cv2.HoughLinesP(image=img_canny, rho=1, theta=np.pi / 180, threshold=20, minLineLength=30,
-                            maxLineGap=10)
+    lines = cv2.HoughLinesP(image=img_canny, rho=1, theta=np.pi / 180, threshold=20, minLineLength=30, maxLineGap=10)
 
     num_black_pixels = img_sharpened.size - cv2.countNonZero(img_sharpened)
 
