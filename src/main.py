@@ -24,6 +24,7 @@ rawCapture = PiRGBArray(camera, size=(w, h))
 
 time.sleep(0.1)
 
+is_first_run = True
 is_finished = False
 
 saw_right_turn_last_frame = False
@@ -42,6 +43,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
     motor_steer = 0
 
     if not maze.is_paused:
+        if not is_first_run:
+            current_direction = maze.simple_path[maze.simple_path_position]
 
         if is_finished and len(maze.full_path) == 0:
             is_finished = False
@@ -64,7 +67,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
                     averageLinePosition += ((x1 + x2) / 2
                                             - averageLinePosition) / (i + 1)
 
-                    # TODO we need to check the bottom part aswell because
+                    # TODO we need to check the bottom part as well because
                     # TODO otherwise it will e.g. go right although there
                     # TODO might be a left in the upper half of the image
                     if not linecalc.is_line_horizontal(x1, y1, x2, y2):
@@ -105,15 +108,21 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
 
             if are_turns_seen_rn[maze.left]:
                 if not current_direction == maze.left:
-                    maze.add_turn(maze.left)
+                    if is_first_run:
+                        maze.add_turn(maze.left)
+                    else:
+                        maze.simple_path_position -= 1
                     current_direction = maze.left
                 motor_steer = -1
 
             elif are_turns_seen_rn[maze.forward]:
                 if are_turns_seen_rn[maze.right]:
                     if not saw_right_turn_last_frame:
-                        maze.add_turn(maze.forward)
-                        current_direction = maze.forward
+                        if is_first_run:
+                            maze.add_turn(maze.forward)
+                            current_direction = maze.forward
+                        else:
+                            maze.simple_path_position -= 1
 
                 pos_to_mid = (w / 2 + (averageLinePosition - w)) / w * 2
 
@@ -138,8 +147,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
 
             elif are_turns_seen_rn[maze.right]:
                 if not current_direction == maze.right:
-                    maze.add_turn(maze.right)
-                    current_direction = maze.right
+                    if is_first_run:
+                        maze.add_turn(maze.right)
+                        current_direction = maze.right
+                    else:
+                        maze.simple_path_position -= 1
                 motor_steer = 1
             else:
                 print("something went wrong")
