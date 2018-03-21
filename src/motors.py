@@ -1,5 +1,3 @@
-# this code will never ever get touched by anybody.
-
 from enum import IntEnum
 
 import RPi.GPIO as GPIO
@@ -49,4 +47,5 @@ def set_speed(left, right):
 
 
 def set_speed_from_speed_steer(speed, steer):
-    set_speed(left=min(1.0, max(-1.0, speed + speed * steer)), right=min(1.0, max(-1.0, speed - speed * steer)))
+    set_speed(left=min(1.0, max(-1.0, speed + speed * steer)),
+              right=min(1.0, max(-1.0, speed - speed * steer)))

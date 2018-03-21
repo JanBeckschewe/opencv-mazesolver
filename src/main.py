@@ -62,7 +62,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 for x1, y1, x2, y2 in line:
                     averageLinePosition += (((x1 + x2) / 2) - averageLinePosition) / (i + 1)
 
-                    # TODO we need to check the bottom part aswell because otherwise it will e.g. go right
+                    # TODO we need to check the bottom part aswell because
+                    # TODO otherwise it will e.g. go right
                     # TODO although there might be a left in the upper half of the image
                     if not linecalc.is_line_horizontal(x1, y1, x2, y2):
                         are_turns_seen_rn[maze.forward] = True
@@ -88,8 +89,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     motor_steer = -1
 
             # TODO I think this should work but I'm not sure, please test this
-            if ((current_direction == maze.right and not are_turns_seen_rn[maze.right]) \
-                        or (current_direction == maze.right and not are_turns_seen_rn[maze.left])) \
+            if ((current_direction == maze.right
+                 and not are_turns_seen_rn[maze.right])
+                or (current_direction == maze.right
+                    and not are_turns_seen_rn[maze.left])) \
                     and are_turns_seen_rn[maze.forward]:
                 current_direction = maze.forward
 
@@ -111,8 +114,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 motor_steer = pconst * pos_to_mid + dconst * (pos_to_mid - last_error)
                 last_error = pos_to_mid
 
-                # PID Control
-                # does not work yet, will maybe work later
+                # # PID Control
+                # # TODO needs some tweaking to work better
                 # current_time = time.time()
                 # delta_time = current_time - last_time
                 # delta_error = pos_to_mid - last_error

@@ -38,7 +38,6 @@ var konvaFullEndPoint = new Konva.Circle({
     radius: 10,
     fill: 'yellow'
 });
-// TODO should be the same as fullEndPoint, only for testing
 var konvaSimpleEndPoint = new Konva.Circle({
     x: 0,
     y: 0,
@@ -51,20 +50,19 @@ layer.add(konvaFullPathLine);
 layer.add(konvaSimplePathLine);
 layer.add(konvaFullStartPoint);
 layer.add(konvaFullEndPoint);
-// TODO .
 layer.add(konvaSimpleEndPoint);
 
 var socket = new WebSocket('ws://' + window.location.hostname + ':8000');
+
 socket.onopen = function (ev) {
     console.log("connected");
 };
 
-var obj;
 socket.onmessage = function (ev) {
-    obj = JSON.parse(ev.data);
-    fullPath = obj.full_path;
-    simplePath = obj.simple_path;
-    console.log(obj);
+    var message = JSON.parse(ev.data);
+    fullPath = message.full_path;
+    simplePath = message.simple_path;
+    console.log(message);
     draw();
 };
 
@@ -84,14 +82,15 @@ function draw() {
     konvaFullEndPoint.x(konvaFullPoints[konvaFullPoints.length - 2]);
     konvaFullEndPoint.y(konvaFullPoints[konvaFullPoints.length - 1]);
 
-    // TODO .
     konvaSimpleEndPoint.x(konvaSimplePoints[konvaSimplePoints.length - 2]);
     konvaSimpleEndPoint.y(konvaSimplePoints[konvaSimplePoints.length - 1]);
 
     var pathBoundsRect = konvaFullPathLine.getClientRect();
     layer.offset({x: pathBoundsRect.x, y: pathBoundsRect.y});
 
-    var scalingFactor = Math.min(stage.width() / pathBoundsRect.width, stage.height() / pathBoundsRect.height);
+    var scalingFactor = Math.min(
+        stage.width() / pathBoundsRect.width,
+        stage.height() / pathBoundsRect.height);
 
     layer.scale({x: scalingFactor, y: scalingFactor});
 
