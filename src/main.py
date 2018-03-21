@@ -30,7 +30,8 @@ saw_right_turn_last_frame = False
 
 current_direction = maze.forward
 
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+for frame in camera.capture_continuous(rawCapture, format="bgr",
+                                       use_video_port=True):
 
     img_canny, lines, num_black_pixels = opencv.modify_image(frame)
 
@@ -60,26 +61,32 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             i = 0
             for line in lines:
                 for x1, y1, x2, y2 in line:
-                    averageLinePosition += (((x1 + x2) / 2) - averageLinePosition) / (i + 1)
+                    averageLinePosition += ((x1 + x2) / 2
+                                            - averageLinePosition) / (i + 1)
 
                     # TODO we need to check the bottom part aswell because
-                    # TODO otherwise it will e.g. go right
-                    # TODO although there might be a left in the upper half of the image
+                    # TODO otherwise it will e.g. go right although there
+                    # TODO might be a left in the upper half of the image
                     if not linecalc.is_line_horizontal(x1, y1, x2, y2):
                         are_turns_seen_rn[maze.forward] = True
                         # green
-                        cv2.line(img_canny, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                        cv2.line(img_canny,
+                                 (x1, y1), (x2, y2), (0, 255, 0), 2)
 
                     else:
-                        if linecalc.contains_line_bottom_left(x1, y1, x2, y2, h, w):
+                        if linecalc.contains_line_bottom_left(
+                                x1, y1, x2, y2, h, w):
                             are_turns_seen_rn[maze.left] = True
                             # blue
-                            cv2.line(img_canny, (x1, y1), (x2, y2), (255, 0, 0), 2)
+                            cv2.line(img_canny,
+                                     (x1, y1), (x2, y2), (255, 0, 0), 2)
 
-                        if linecalc.contains_line_bottom_right(x1, y1, x2, y2, h, w):
+                        if linecalc.contains_line_bottom_right(
+                                x1, y1, x2, y2, h, w):
                             are_turns_seen_rn[maze.right] = True
                             # red
-                            cv2.line(img_canny, (x1, y1), (x2, y2), (0, 0, 255), 2)
+                            cv2.line(img_canny,
+                                     (x1, y1), (x2, y2), (0, 0, 255), 2)
 
             if current_direction == maze.backward:
                 motor_steer = 1
@@ -111,7 +118,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 pos_to_mid = (w / 2 + (averageLinePosition - w)) / w * 2
 
                 # PD control
-                motor_steer = pconst * pos_to_mid + dconst * (pos_to_mid - last_error)
+                motor_steer = pconst * pos_to_mid \
+                              + dconst * (pos_to_mid - last_error)
                 last_error = pos_to_mid
 
                 # # PID Control
@@ -122,7 +130,9 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 # integral += pos_to_mid * delta_time
                 # integral = min(1., max(-1., integral))
                 # pos_to_mid = (w / 2 + (averageLinePosition - w)) / w * 2
-                # motor_steer = pconst * pos_to_mid + dconst * (delta_error / delta_time) + iconst * integral
+                # motor_steer = pconst * pos_to_mid \
+                #               + dconst * (delta_error / delta_time) \
+                #               + iconst * integral
                 # last_error = pos_to_mid
                 # last_time = current_time
 
@@ -137,7 +147,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             if not are_turns_seen_rn[maze.right]:
                 saw_right_turn_last_frame = False
 
-        motors.set_speed_from_speed_steer(0 if is_finished else .4, motor_steer)
+        motors.set_speed_from_speed_steer(
+            0 if is_finished else .4, motor_steer)
 
     else:
         motors.set_speed(0, 0)
