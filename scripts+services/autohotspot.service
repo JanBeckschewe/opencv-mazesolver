@@ -6,6 +6,6 @@ User=root
 Group=root
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/autohotspot.sh
+ExecStart=/home/pi/opencv-mazesolver/scripts+services/autohotspot.sh
 [Install]
 WantedBy=multi-user.target
