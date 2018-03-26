@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import time
 
 import cv2
@@ -44,7 +45,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
 
     if not maze.is_paused:
         if not is_first_run:
-            current_direction = maze.simple_path[maze.simple_path_position]
+            oppsite_direction = maze.simple_path[maze.simple_path_position]
+            current_direction = maze.forward \
+                if oppsite_direction == maze.forward \
+                else abs(2 - oppsite_direction)
 
         if is_finished and len(maze.full_path) == 0:
             is_finished = False
@@ -167,6 +171,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
         print("paused")
 
     cv2.imshow("Frame", img_canny)
+    cv2.imwrite("httpdocs/img.png", img_canny)
     key = cv2.waitKey(1) & 0xFF
 
     rawCapture.truncate(0)

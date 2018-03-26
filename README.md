@@ -13,6 +13,7 @@ A Raspberry Pi based robot with openCV that drives through a maze
 - simple-websocket-server
 - rpi.gpio
 - picamera
+- mjpg-streamer
 #### Setup
 - set up the path to your `src/httpdocs` folder inside the `/etc/apache2` directory
 ### Run the program

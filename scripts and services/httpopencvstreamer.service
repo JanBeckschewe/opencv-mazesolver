@@ -1,0 +1,9 @@
+[Unit]
+Description=Streams the current image from the OpenCV Mazesolver via HTTP
+
+[Service]
+Type=simple
+ExecStart=/home/pi/httpopencvstreamer.sh
+
+[Install]
+WantedBy=multi-user.target

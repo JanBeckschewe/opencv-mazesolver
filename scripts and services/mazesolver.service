@@ -1,0 +1,9 @@
+[Unit]
+Description=Solve the maze with OpenCV and show the result on the website
+
+[Service]
+Type=simple
+ExecStart=/home/pi/opencv-mazesolver/src/main.py
+
+[Install]
+WantedBy=multi-user.target

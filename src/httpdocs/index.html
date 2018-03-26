@@ -16,6 +16,8 @@
     <button onclick="socket.send('reset')">reset</button>
 </div>
 
+<script>document.write('<img id="image" src="http://'+window.location.hostname+':8080?action=stream">')</script>
+
 <div id="konva_canvas">k</div>
 <script type="text/javascript" src="websocket.js"></script>
 <script type="text/javascript" src="drawing.js"></script>
