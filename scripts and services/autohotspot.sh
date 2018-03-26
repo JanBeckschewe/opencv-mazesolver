@@ -156,4 +156,3 @@ else #ssid or MAC address not in range
               createAdHocNetwork
        fi 
 fi 
-
