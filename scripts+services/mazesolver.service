@@ -1,8 +1,10 @@
 [Unit]
 Description=Solve the maze with OpenCV and show the result on the website
+After=multi.user.target
 
 [Service]
-Type=simple
+Type=idle
+WorkingDirectory=/home/pi/opencv-mazesolver/src
 ExecStart=/home/pi/opencv-mazesolver/src/main.py
 
 [Install]

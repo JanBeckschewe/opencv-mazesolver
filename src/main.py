@@ -170,8 +170,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
         motors.set_speed(0, 0)
         print("paused")
 
-    cv2.imshow("Frame", img_canny)
-    # cv2.imwrite("httpdocs/img.png", img_canny)
+    # cv2.imshow("Frame", img_canny)
+    cv2.imwrite("httpdocs/img.png", img_canny)
     key = cv2.waitKey(1) & 0xFF
 
     rawCapture.truncate(0)
