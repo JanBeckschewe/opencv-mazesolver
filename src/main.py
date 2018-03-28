@@ -15,7 +15,7 @@ integral = 0
 last_error = 0
 last_time = time.time()
 
-w, h = 160, 120
+w, h = 128, 96
 
 camera = PiCamera()
 camera.resolution = (w, h)
@@ -62,7 +62,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
         elif lines is None:
             if not current_direction == maze.backward:
                 maze.add_turn(maze.backward)
-            motor_steer = 1
+            motor_steer = 2
             current_direction = maze.backward
         else:
             i = 0
@@ -96,11 +96,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
                                      (x1, y1), (x2, y2), (0, 0, 255), 2)
 
             if current_direction == maze.backward:
-                motor_steer = 1
+                motor_steer = 2
                 if are_turns_seen_rn[maze.forward]:
                     current_direction = maze.forward
                 elif are_turns_seen_rn[maze.left]:
-                    motor_steer = -1
+                    motor_steer = -2
 
             # TODO I think this should work but I'm not sure, please test this
             if ((current_direction == maze.right
@@ -117,7 +117,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
                     else:
                         maze.simple_path_position -= 1
                     current_direction = maze.left
-                motor_steer = -1
+                motor_steer = -2
 
             elif are_turns_seen_rn[maze.forward]:
                 if are_turns_seen_rn[maze.right]:
@@ -156,7 +156,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
                         current_direction = maze.right
                     else:
                         maze.simple_path_position -= 1
-                motor_steer = 1
+                motor_steer = 2
             else:
                 print("something went wrong")
 
@@ -164,7 +164,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
                 saw_right_turn_last_frame = False
 
         motors.set_speed_from_speed_steer(
-            0 if is_finished else .4, motor_steer)
+            0 if is_finished else .25, motor_steer)
 
     else:
         motors.set_speed(0, 0)
