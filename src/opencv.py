@@ -27,7 +27,9 @@ def modify_image(frame):
                             minLineLength=30,
                             maxLineGap=10)
 
-    num_black_pixels = img_sharpened.size - cv2.countNonZero(img_sharpened)
+    img_black_thres = cv2.inRange(img_sharpened, 0, 50)
+
+    num_black_pixels = cv2.countNonZero(img_black_thres)
 
     img_sharpened = cv2.cvtColor(img_sharpened, cv2.COLOR_GRAY2BGR)
     # img_canny = cv2.cvtColor(img_canny, cv2.COLOR_GRAY2BGR)

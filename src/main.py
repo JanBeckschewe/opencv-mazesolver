@@ -10,7 +10,7 @@ import maze
 import motors
 import opencv
 
-pconst, iconst, dconst = 1., 0., 0.
+pconst, iconst, dconst = 1., .3, 0.
 integral = 0
 last_error = 0
 last_time = time.time()
@@ -20,6 +20,7 @@ w, h = 128, 96
 camera = PiCamera()
 camera.resolution = (w, h)
 camera.framerate = 40
+camera.exposure_mode = "off"
 
 rawCapture = PiRGBArray(camera, size=(w, h))
 
@@ -27,6 +28,8 @@ time.sleep(0.1)
 
 is_first_run = True
 is_finished = False
+
+is_in_backwards_left_turn = False
 
 saw_right_turn_last_frame = False
 
@@ -53,7 +56,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
         if is_finished and len(maze.full_path) == 0:
             is_finished = False
 
-        if not is_finished and num_black_pixels > w * h * .35:
+        if not is_finished and num_black_pixels > w * h * .5:
             is_finished = True
             print("is finished")
 
@@ -84,14 +87,14 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
                         if linecalc.contains_line_bottom_left(
                                 x1, y1, x2, y2, h, w):
                             are_turns_seen_rn[maze.left] = True
-                            # blue
+                            # red
                             cv2.line(img_canny,
                                      (x1, y1), (x2, y2), (255, 0, 0), 2)
 
                         if linecalc.contains_line_bottom_right(
                                 x1, y1, x2, y2, h, w):
                             are_turns_seen_rn[maze.right] = True
-                            # red
+                            # blue
                             cv2.line(img_canny,
                                      (x1, y1), (x2, y2), (0, 0, 255), 2)
 
@@ -99,8 +102,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
                 motor_steer = 2
                 if are_turns_seen_rn[maze.forward]:
                     current_direction = maze.forward
-                elif are_turns_seen_rn[maze.left]:
+                elif are_turns_seen_rn[maze.left] or is_in_backwards_left_turn:
+                    is_in_backwards_left_turn = True
                     motor_steer = -2
+            else:
+                is_in_backwards_left_turn = False
 
             # TODO I think this should work but I'm not sure, please test this
             if ((current_direction == maze.right
@@ -164,7 +170,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
                 saw_right_turn_last_frame = False
 
         motors.set_speed_from_speed_steer(
-            0 if is_finished else .25, motor_steer)
+            0 if is_finished else .4, motor_steer)
+        print(motor_steer)
 
     else:
         motors.set_speed(0, 0)
