@@ -5,15 +5,10 @@ import cv2
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 
-import linecalc
 import maze
 import motors
 import opencv
-
-pconst, iconst, dconst = 1., .3, 0.
-integral = 0
-last_error = 0
-last_time = time.time()
+import pid_control
 
 w, h = 128, 96
 
@@ -46,6 +41,17 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
 
     motor_steer = 0
 
+    i = 0
+    if lines is not None:
+        for line in lines:
+            for x1, y1, x2, y2 in line:
+                averageLinePosition += ((x1 + x2) / 2
+                                        - averageLinePosition) / (i + 1)
+                i += 1
+
+                opencv.find_lines(img_canny, x1, y1, x2, y2, w, h,
+                                  are_turns_seen_rn)
+
     if not maze.is_paused:
         if not is_first_run:
             oppsite_direction = maze.simple_path[maze.simple_path_position]
@@ -53,9 +59,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
                 if oppsite_direction == maze.forward \
                 else abs(2 - oppsite_direction)
 
+        # when reset from website
         if is_finished and len(maze.full_path) == 0:
             is_finished = False
 
+        # when reached end
         if not is_finished and num_black_pixels > w * h * .5:
             is_finished = True
             print("is finished")
@@ -67,37 +75,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
                 maze.add_turn(maze.backward)
             motor_steer = 2
             current_direction = maze.backward
+
         else:
-            i = 0
-            for line in lines:
-                for x1, y1, x2, y2 in line:
-                    averageLinePosition += ((x1 + x2) / 2
-                                            - averageLinePosition) / (i + 1)
-
-                    # TODO we need to check the bottom part as well because
-                    # TODO otherwise it will e.g. go right although there
-                    # TODO might be a left in the upper half of the image
-                    if not linecalc.is_line_horizontal(x1, y1, x2, y2):
-                        are_turns_seen_rn[maze.forward] = True
-                        # green
-                        cv2.line(img_canny,
-                                 (x1, y1), (x2, y2), (0, 255, 0), 2)
-
-                    else:
-                        if linecalc.contains_line_bottom_left(
-                                x1, y1, x2, y2, h, w):
-                            are_turns_seen_rn[maze.left] = True
-                            # red
-                            cv2.line(img_canny,
-                                     (x1, y1), (x2, y2), (255, 0, 0), 2)
-
-                        if linecalc.contains_line_bottom_right(
-                                x1, y1, x2, y2, h, w):
-                            are_turns_seen_rn[maze.right] = True
-                            # blue
-                            cv2.line(img_canny,
-                                     (x1, y1), (x2, y2), (0, 0, 255), 2)
-
             if current_direction == maze.backward:
                 motor_steer = 2
                 if are_turns_seen_rn[maze.forward]:
@@ -108,7 +87,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
             else:
                 is_in_backwards_left_turn = False
 
-            # TODO I think this should work but I'm not sure, please test this
             if ((current_direction == maze.right
                  and not are_turns_seen_rn[maze.right])
                 or (current_direction == maze.right
@@ -124,7 +102,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
                         maze.simple_path_position -= 1
                     current_direction = maze.left
                 motor_steer = -2
-
             elif are_turns_seen_rn[maze.forward]:
                 if are_turns_seen_rn[maze.right]:
                     if not saw_right_turn_last_frame:
@@ -136,25 +113,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
 
                 pos_to_mid = (w / 2 + (averageLinePosition - w)) / w * 2
 
-                # PD control
-                motor_steer = pconst * pos_to_mid \
-                              + dconst * (pos_to_mid - last_error)
-                last_error = pos_to_mid
-
-                # # PID Control
-                # # TODO needs some tweaking to work better
-                # current_time = time.time()
-                # delta_time = current_time - last_time
-                # delta_error = pos_to_mid - last_error
-                # integral += pos_to_mid * delta_time
-                # integral = min(1., max(-1., integral))
-                # pos_to_mid = (w / 2 + (averageLinePosition - w)) / w * 2
-                # motor_steer = pconst * pos_to_mid \
-                #               + dconst * (delta_error / delta_time) \
-                #               + iconst * integral
-                # last_error = pos_to_mid
-                # last_time = current_time
-
+                motor_steer = pid_control.pid_drive(pos_to_mid)
             elif are_turns_seen_rn[maze.right]:
                 if not current_direction == maze.right:
                     if is_first_run:
@@ -171,13 +130,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr",
 
         motors.set_speed_from_speed_steer(
             0 if is_finished else .4, motor_steer)
-        print(motor_steer)
 
     else:
         motors.set_speed(0, 0)
-        print("paused")
 
-    # cv2.imshow("Frame", img_canny)
     cv2.imwrite("httpdocs/img.png", img_canny)
     key = cv2.waitKey(1) & 0xFF
 
