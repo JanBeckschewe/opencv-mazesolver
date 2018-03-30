@@ -18,8 +18,7 @@ class SocketHandler(WebSocket):
         elif self.data == "start":
             maze.is_paused = False
         elif self.data == "reset":
-            maze.full_path.clear()
-            maze.simple_path.clear()
+            maze.reset()
             send_path()
 
     def handleConnected(self):
@@ -31,7 +30,7 @@ class SocketHandler(WebSocket):
 
 
 def send_path():
-    print(maze.full_path[-1])
+    print(maze.full_path[-1] if maze.full_path else "[]")
     json_object = {
         "full_path": maze.full_path,
         "simple_path": maze.simple_path,
@@ -44,8 +43,8 @@ def send_path():
 def continually_append_random_turn():
     for i in range(len(maze.path_dirs)):
         maze.add_turn(maze.path_dirs[i])
-    # while True:
-    #     maze.add_turn(random.randint(0, 3))
+        # while True:
+        #     maze.add_turn(random.randint(0, 3))
         time.sleep(1)
 
 

@@ -19,7 +19,7 @@ time_last_turn = time.time()
 
 def add_turn(turn):
     global time_last_turn
-    turn_with_time = [turn, time.time() - time_last_turn]
+    turn_with_time = [turn, int((time.time() - time_last_turn) * 1000)]
     time_last_turn = time.time()
     full_path.append(turn_with_time)
     simple_path.append(turn_with_time)
@@ -44,3 +44,10 @@ def simplify_path():
         simple_path.pop()
 
     simple_path.append([new_turn, length])
+
+
+def reset():
+    global time_last_turn
+    full_path.clear()
+    simple_path.clear()
+    time_last_turn = time.time()

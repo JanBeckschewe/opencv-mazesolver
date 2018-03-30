@@ -14,31 +14,31 @@ stage.add(layer);
 var konvaFullPathLine = new Konva.Line({
     points: konvaFullPoints,
     stroke: 'red',
-    strokeWidth: 10,
+    strokeWidth: 250,
     closed: false
 });
 var konvaSimplePathLine = new Konva.Line({
     points: konvaSimplePoints,
     stroke: 'green',
-    strokeWidth: 6,
+    strokeWidth: 150,
     closed: false
 });
 var konvaFullStartPoint = new Konva.Circle({
     x: 0,
     y: 0,
-    radius: 10,
+    radius: 300,
     fill: 'blue'
 });
 var konvaFullEndPoint = new Konva.Circle({
     x: 0,
     y: 0,
-    radius: 10,
+    radius: 300,
     fill: 'yellow'
 });
 var konvaSimpleEndPoint = new Konva.Circle({
     x: 0,
     y: 0,
-    radius: 10,
+    radius: 300,
     fill: 'orange'
 });
 
@@ -69,6 +69,7 @@ function draw() {
     konvaSimpleEndPoint.y(konvaSimplePoints[konvaSimplePoints.length - 1]);
 
     var pathBoundsRect = konvaFullPathLine.getClientRect();
+
     layer.offset({x: pathBoundsRect.x, y: pathBoundsRect.y});
 
     var scalingFactor = Math.min(
