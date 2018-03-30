@@ -122,7 +122,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         else:
             print("something went horrible")
 
-        motors.set_speed_from_speed_steer(.28, motor_steer)
+        motors.set_speed_from_speed_steer(.33, motor_steer)
     else:
         motors.set_speed(0, 0)
 

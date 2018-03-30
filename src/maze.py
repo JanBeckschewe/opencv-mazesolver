@@ -1,6 +1,7 @@
 import random
+import time
 
-import server
+import ws_server
 
 is_paused = False
 
@@ -13,13 +14,17 @@ full_path_position = 0
 simple_path = []
 simple_path_position = 0
 
+time_last_turn = time.time()
+
 
 def add_turn(turn):
-    turn_with_time = [turn, random.randint(50, 150)]
+    global time_last_turn
+    turn_with_time = [turn, time.time() - time_last_turn]
+    time_last_turn = time.time()
     full_path.append(turn_with_time)
     simple_path.append(turn_with_time)
     simplify_path()
-    server.send_path()
+    ws_server.send_path()
 
 
 def simplify_path():

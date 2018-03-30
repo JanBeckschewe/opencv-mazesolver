@@ -49,6 +49,6 @@ def continually_append_random_turn():
         time.sleep(1)
 
 
-ws_server = SimpleWebSocketServer("0.0.0.0", 8000, SocketHandler)
+ws_server = SimpleWebSocketServer("127.0.0.1", 9002, SocketHandler)
 
 threading.Thread(target=ws_server.serveforever).start()

@@ -1,5 +1,5 @@
 import threading
 
-import server
+import ws_server
 
-threading.Thread(target=server.continually_append_random_turn()).start()
+threading.Thread(target=ws_server.continually_append_random_turn()).start()
