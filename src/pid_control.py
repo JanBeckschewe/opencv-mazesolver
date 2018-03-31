@@ -1,6 +1,6 @@
 import time
 
-pconst, iconst, dconst = 1., .3, 0.
+pconst, iconst, dconst = 1., .15, 0.
 integral = 0
 last_error = 0
 last_time = time.time()

@@ -64,10 +64,9 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             opposite_direction = maze.simple_path[maze.simple_path_position]
             current_direction = maze.forward if opposite_direction == maze.forward else abs(2 - opposite_direction)
 
-        if lines is None:
-            if current_direction != maze.backward:
-                maze.add_turn(maze.backward)
-                current_direction = maze.backward
+        if lines is None and current_direction == maze.forward:
+            maze.add_turn(maze.backward)
+            current_direction = maze.backward
 
         if current_direction == maze.backward:
             if are_turns_seen_rn[maze.forward]:
@@ -90,7 +89,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             elif are_turns_seen_rn[maze.forward] and are_turns_seen_rn[maze.right] and not saw_right_turn_last_frame:
                 saw_right_turn_last_frame = True
                 new_turn = maze.forward
-            elif are_turns_seen_rn[maze.right] and current_direction != maze.right:
+            elif are_turns_seen_rn[maze.right] and current_direction != maze.right and not are_turns_seen_rn[maze.forward]:
                 new_turn = maze.right
             else:
                 new_turn = None

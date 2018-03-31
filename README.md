@@ -9,17 +9,15 @@ A Raspberry Pi based robot with openCV that drives through a maze
 - python3
 - opencv
 - pyyaml
-- apache2
+- nginx
 - simple-websocket-server
 - rpi.gpio
 - picamera
 - mjpg-streamer
 #### Setup
-- set up the path to your `src/httpdocs` folder inside the `/etc/apache2` directory
+- move all the ```*.service``` files from ```scripts+services``` to ```/etc/systemd/systemd/```
+- enable them wih ```sudo systemctl enable mazesolver autohotspot httpopencvstreamer```
+- move ```nginx_mazesolver.conf``` to ```/etc/nginx/conf.d/```
 ### Run the program
-- run `python main.py` inside the `src` folder
-- open your Pi's IP address inside your web browser
-
-
-## sources
-- [calibration procedure](https://github.com/tizianofiorenzani/how_do_drones_work/tree/master/opencv)
+- open your Pi's IP address or domain inside your web browser
+- click the start button
