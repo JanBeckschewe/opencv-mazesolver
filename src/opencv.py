@@ -1,15 +1,11 @@
 import cv2
 import numpy as np
-import yaml
 
 import linecalc
 import maze
 
-with open("camera_calibration_values.yaml") as calibration_matrix:
-    cal_mat = yaml.load(calibration_matrix)
-
-np_camera_matrix = np.array(cal_mat['camera_matrix'])
-np_distortion_coefficients = np.array(cal_mat['distortion_coefficients'])
+np_camera_matrix = np.array([[47., 0., 70.], [0., 93., 48.], [0., 0., 1.]])
+np_distortion_coefficients = np.array([-3.0048e-01, 8.4940e-02, -3.5780e-03, -2.08614e-03, -1.0185e-02])
 
 
 def modify_image(frame):
@@ -34,10 +30,7 @@ def modify_image(frame):
 
     num_black_pixels = cv2.countNonZero(img_black_thres)
 
-    img_sharpened = cv2.cvtColor(img_sharpened, cv2.COLOR_GRAY2BGR)
-    # img_canny = cv2.cvtColor(img_canny, cv2.COLOR_GRAY2BGR)
-
-    return img_sharpened, lines, num_black_pixels
+    return cv2.cvtColor(img_sharpened, cv2.COLOR_GRAY2BGR), lines, num_black_pixels
 
 
 def find_lines(img_canny, x1, y1, x2, y2, w, h, are_turns_seen_rn):

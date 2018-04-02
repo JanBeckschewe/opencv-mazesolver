@@ -1,8 +1,6 @@
 import json
-import random
 import threading
 
-import time
 from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer
 
 import maze
@@ -38,14 +36,6 @@ def send_path():
     }
     for client in clients:
         client.sendMessage(json.dumps(json_object))
-
-
-def continually_append_random_turn():
-    for i in range(len(maze.path_dirs)):
-        maze.add_turn(maze.path_dirs[i])
-        # while True:
-        #     maze.add_turn(random.randint(0, 3))
-        time.sleep(1)
 
 
 ws_server = SimpleWebSocketServer("127.0.0.1", 9002, SocketHandler)
