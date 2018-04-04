@@ -68,9 +68,10 @@ def solve_maze():
             if lines is None and current_direction == maze.forward:
                 maze.add_turn(maze.backward)
                 current_direction = maze.backward
+                print("added_backward")
 
             if current_direction == maze.backward:
-                if are_turns_seen_rn[maze.forward]:
+                if are_turns_seen_rn[maze.forward] or are_turns_seen_rn[maze.backward]:
                     current_direction = maze.forward
                 if are_turns_seen_rn[maze.left]:
                     is_in_backwards_left_turn = True
@@ -81,17 +82,21 @@ def solve_maze():
                 motor_steer = -2
 
             if ((current_direction == maze.left and not are_turns_seen_rn[maze.left]) or (
-                    current_direction == maze.right and not are_turns_seen_rn[maze.right])) and are_turns_seen_rn[maze.forward]:
+                    current_direction == maze.right and not are_turns_seen_rn[maze.right])) and (
+                    are_turns_seen_rn[maze.forward] or are_turns_seen_rn[maze.backward]):
                 current_direction = maze.forward
 
             if current_direction == maze.forward:
-                if are_turns_seen_rn[maze.left] and current_direction != maze.left:
+                if are_turns_seen_rn[maze.left]:
                     new_turn = maze.left
+                    print("added_left")
                 elif are_turns_seen_rn[maze.forward] and are_turns_seen_rn[maze.right] and not saw_right_turn_last_frame:
                     saw_right_turn_last_frame = True
                     new_turn = maze.forward
-                elif are_turns_seen_rn[maze.right] and current_direction != maze.right and not are_turns_seen_rn[maze.forward]:
+                    print("added_forward")
+                elif are_turns_seen_rn[maze.right] and not are_turns_seen_rn[maze.forward]:
                     new_turn = maze.right
+                    print("added_right")
                 else:
                     new_turn = None
 

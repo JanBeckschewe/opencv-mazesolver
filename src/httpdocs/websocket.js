@@ -4,7 +4,7 @@ var simplePath = [];
 var socket;
 
 function connect() {
-    socket = new WebSocket('ws://' + window.location.hostname + '/ws');
+    socket = new WebSocket('wss://' + window.location.hostname + '/ws');
 
     socket.onopen = function () {
         console.log("connected");

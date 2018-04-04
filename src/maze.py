@@ -1,9 +1,8 @@
-import random
 import time
 
 import ws_server
 
-is_paused = False
+is_paused = True
 
 forward, right, backward, left = range(4)
 

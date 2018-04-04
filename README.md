@@ -3,6 +3,9 @@ A Raspberry Pi based robot with openCV that drives through a maze
 
 ![](vehicle.jpg)
 
+We have also build a website for it where you can see the current camera image and the maze it has found.
+![](website_screenshot.png)
+
 ## How to use
 ### Installation
 #### Install these dependencies:
