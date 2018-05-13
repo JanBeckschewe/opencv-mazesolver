@@ -2,51 +2,63 @@ import time
 
 import ws_server
 
-is_paused = True
 
-forward, right, backward, left = range(4)
+class Maze:
+    def __init__(self):
+        self.ws_server = ws_server.WsServer(self)
 
-path_dirs = [forward, right, left, backward, left]
+        self.is_paused = True
 
-full_path = []
-full_path_position = 0
-simple_path = []
-simple_path_position = 0
+        self.forward, self.right, self.backward, self.left = range(4)
 
-time_last_turn = time.time()
+        self.path_dirs = [self.forward, self.right, self.left, self.backward, self.left]
 
+        self.full_path = []
+        self.full_path_position = 0
+        self.simple_path = []
+        self.simple_path_position = 0
 
-def add_turn(turn):
-    global time_last_turn
-    turn_with_time = [turn, int((time.time() - time_last_turn) * 1000)]
-    time_last_turn = time.time()
-    full_path.append(turn_with_time)
-    simple_path.append(turn_with_time)
-    simplify_path()
-    ws_server.send_path()
+        self.time_last_turn = time.time()
 
+    def get_direction_string(self, dir_num):
+        dir_string = ""
+        if dir_num == 0:
+            dir_string = "forward"
+        elif dir_num == 1:
+            dir_string = "right"
+        elif dir_num == 2:
+            dir_string = "backwards"
+        elif dir_num == 3:
+            dir_string = "left"
+        return dir_string
 
-def simplify_path():
-    if len(simple_path) < 3 or simple_path[-2][0] != backward:
-        return
+    def add_turn(self, turn):
+        turn_with_time = [turn, int((time.time() - self.time_last_turn) * 1000)]
+        self.time_last_turn = time.time()
+        self.full_path.append(turn_with_time)
+        self.simple_path.append(turn_with_time)
+        self.simplify_path()
+        self.ws_server.send_path()
 
-    total_angle = 0
+    def simplify_path(self):
+        if len(self.simple_path) < 3 or self.simple_path[-2][0] != self.backward:
+            return
 
-    for x in range(1, 4):
-        total_angle += simple_path[-x][0]
+        total_angle = 0
 
-    new_turn = total_angle % 4
+        for x in range(1, 4):
+            total_angle += self.simple_path[-x][0]
 
-    length = simple_path[-1][1]
+        new_turn = total_angle % 4
 
-    for x in range(3):
-        simple_path.pop()
+        length = self.simple_path[-1][1]
 
-    simple_path.append([new_turn, length])
+        for x in range(3):
+            self.simple_path.pop()
 
+            self.simple_path.append([new_turn, length])
 
-def reset():
-    global time_last_turn
-    full_path.clear()
-    simple_path.clear()
-    time_last_turn = time.time()
+    def reset(self):
+        self.full_path.clear()
+        self.simple_path.clear()
+        self.time_last_turn = time.time()
