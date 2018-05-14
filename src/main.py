@@ -4,19 +4,18 @@ import threading
 import time
 
 import cv2
-from PIL import Image
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 
 import maze
 import motors
 import opencv
-import pid_control
+import pid_from_github
 
 
 class MainClass:
     def __init__(self):
-        self.w, self.h, self.framerate = 128, 96, 70
+        self.w, self.h, self.framerate = 128, 96, 50
         self.camera = PiCamera()
         self.camera.resolution = (self.w, self.h)
         self.camera.framerate = self.framerate
@@ -26,7 +25,9 @@ class MainClass:
         self.frame = None
 
         self.maze = maze.Maze()
-        self.opencv = opencv.OpenCV(self.maze)
+        self.opencv = opencv.OpenCV(self.maze, self.w, self.h)
+        self.pid = pid_from_github.PID(1, .05, .4)
+        self.motors = motors.Motors()
 
         self.is_first_run = True
         self.is_finished = False
@@ -39,9 +40,9 @@ class MainClass:
 
         time.sleep(0.1)
 
-        # self.ffmpeg_process = subprocess.Popen(
-        #     "ffmpeg -y -f image2pipe -vcodec mjpeg -r 24 -i - -vcodec h264 -reset_timestamps 1 -movflags frag_keyframe+empty_moov httpdocs/lastrun.mp4",
-        #     stdin=subprocess.PIPE, shell=True)
+        self.ffmpeg_process = subprocess.Popen(
+            "ffmpeg -y -f rawvideo -video_size 128x96 -pixel_format bgr24 -r 43 -i - -vcodec h264 -pix_fmt yuv420p -reset_timestamps 1 -movflags frag_keyframe+empty_moov httpdocs/lastrun.mp4",
+            stdin=subprocess.PIPE, shell=True)
 
         threading.Thread(target=self.loop_over_camera).start()
 
@@ -52,7 +53,7 @@ class MainClass:
             self.frame = frame
             self.raw_capture.truncate(0)
 
-            print("camera:" + str(1 / (time.time() - time_last_frame)))
+            print("camera:" + str(1 / (time.time() - time_last_frame)), end='\r')
             time_last_frame = time.time()
 
             if not started:
@@ -65,10 +66,12 @@ class MainClass:
         # im = Image.fromarray(img)
         # im.save(self.ffmpeg_process.stdin, 'JPEG')
 
+        self.ffmpeg_process.stdin.write(img.tostring())
+
     def solve_maze(self):
         time_last_frame = time.time()
         while True:
-            print("solver:" + str(1 / (time.time() - time_last_frame)))
+            print("solver:" + str(1 / (time.time() - time_last_frame)), end='\r')
             time_last_frame = time.time()
 
             img_canny, lines, num_black_pixels = self.opencv.modify_image(self.frame)
@@ -86,8 +89,7 @@ class MainClass:
                         average_line_position += ((x1 + x2) / 2 - average_line_position) / (i + 1)
                         i += 1
 
-                        self.opencv.find_lines(img_canny, x1, y1, x2, y2, self.w, self.h,
-                                               are_turns_seen_rn)
+                        self.opencv.find_lines(img_canny, x1, y1, x2, y2, are_turns_seen_rn)
 
             # when reset from website
             if self.is_finished and len(self.maze.full_path) == 0:
@@ -96,7 +98,7 @@ class MainClass:
             # when reached end
             if not self.is_finished and num_black_pixels > self.w * self.h * .5:
                 self.is_finished = True
-                print("is finished")
+                print("is finished", end='\r')
 
             if not self.maze.is_paused and not self.is_finished:
                 if not self.is_first_run:
@@ -156,7 +158,10 @@ class MainClass:
                 elif self.current_direction == self.maze.forward:
                     pos_to_mid = (self.w / 2 + (average_line_position - self.w)) / self.w * 2
 
-                    motor_steer = pid_control.pid_drive(pos_to_mid)
+                    # PID
+                    self.pid.update(pos_to_mid)
+                    motor_steer = - self.pid.output
+
                 elif self.current_direction == self.maze.right:
                     motor_steer = 2
                 elif self.current_direction == self.maze.backward:
@@ -167,9 +172,9 @@ class MainClass:
                 else:
                     print("something went horrible")
 
-                motors.set_speed_from_speed_steer(.33, motor_steer)
+                self.motors.set_speed_from_speed_steer(.25, motor_steer)
             else:
-                motors.set_speed(0, 0)
+                self.motors.set_speed(0, 0)
 
             cv2.putText(img_canny, 'directNr: ' + str(motor_steer), (5, 10), 0, .5, (0, 0, 255), 1, cv2.LINE_AA)
             cv2.putText(img_canny, 'direction: ' + self.maze.get_direction_string(self.current_direction),

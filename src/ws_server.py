@@ -3,7 +3,6 @@ import threading
 
 from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer
 
-
 # there has to be a better way to solve this problem
 ws_server_obj = None
 
