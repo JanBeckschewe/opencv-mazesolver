@@ -1,23 +1,40 @@
-#konva_canvas {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
+/*#konva_canvas {*/
+    /*margin: 0;*/
+    /*padding: 0;*/
+    /*overflow: hidden;*/
+/*}*/
+
+/* Custom, iPhone Retina */
+@media only screen and (min-width: 320px) {
+    .blurry_image {
+        width: 100%;
+    }
 }
 
-#buttons {
-    text-align: center;
+/* Extra Small Devices, Phones */
+@media only screen and (min-width: 480px) {
+    .blurry_image {
+        width: 80%;
+    }
 }
 
-body {
-    margin: 0;
+/* Small Devices, Tablets */
+@media only screen and (min-width: 768px) {
+    .blurry_image {
+        width: 60%;
+    }
 }
 
-button {
-    font-family: sans-serif;
+/* Medium Devices, Desktops */
+@media only screen and (min-width: 992px) {
+    .blurry_image {
+        width: 40%;
+    }
 }
 
-img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+/* Large Devices, Wide Screens */
+@media only screen and (min-width: 1200px) {
+    .blurry_image {
+        width: 30%;
+    }
 }

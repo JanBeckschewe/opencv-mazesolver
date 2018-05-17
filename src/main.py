@@ -29,6 +29,8 @@ class MainClass:
         self.pid = pid_from_github.PID(1, .05, .4)
         self.motors = motors.Motors()
 
+        self.total_frames = 0
+
         self.is_first_run = True
         self.is_finished = False
 
@@ -41,7 +43,24 @@ class MainClass:
         time.sleep(0.1)
 
         self.ffmpeg_process = subprocess.Popen(
-            "ffmpeg -y -f rawvideo -video_size 128x96 -pixel_format bgr24 -r 43 -i - -vcodec h264 -pix_fmt yuv420p -reset_timestamps 1 -movflags frag_keyframe+empty_moov httpdocs/lastrun.mp4",
+            "ffmpeg "
+            "-y "
+            "-f rawvideo "
+            "-video_size 128x96 "
+            "-pixel_format bgr24 "
+            "-r 43 "
+            "-i - "
+            "-vcodec h264 "
+            "-profile:v baseline "
+            "-bf 0 "
+            "-pix_fmt yuv420p "
+            "-loglevel warning "
+            "-reset_timestamps 1 "
+            "-movflags frag_keyframe+empty_moov "
+            "-fflags nobuffer "
+            "-tune zerolatency "
+            "-f rtp rtp://127.0.0.1:8004",
+            # "httpdocs/lastrun.mp4",
             stdin=subprocess.PIPE, shell=True)
 
         threading.Thread(target=self.loop_over_camera).start()
@@ -61,10 +80,9 @@ class MainClass:
                 started = True
 
     def store_image(self, img):
-        cv2.imwrite("httpdocs/img.png", img)
-
-        # im = Image.fromarray(img)
-        # im.save(self.ffmpeg_process.stdin, 'JPEG')
+        if self.total_frames % 6 == 0:
+            cv2.imwrite("httpdocs/img.png", img)
+        self.total_frames += 1
 
         self.ffmpeg_process.stdin.write(img.tostring())
 
@@ -172,7 +190,7 @@ class MainClass:
                 else:
                     print("something went horrible")
 
-                self.motors.set_speed_from_speed_steer(.25, motor_steer)
+                self.motors.set_speed_from_speed_steer(.33, motor_steer)
             else:
                 self.motors.set_speed(0, 0)
 

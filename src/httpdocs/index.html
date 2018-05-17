@@ -3,26 +3,30 @@
 <head>
     <meta charset="utf-8">
     <title>OpenCV Mazesolver</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="shortcut icon" href="favicon.png">
     <link rel="stylesheet" href="style.css">
     <script src="konva.min.js"></script>
 </head>
 
 <body>
-<div id="buttons">
-    <button onclick="socket.send('start')">start</button>
-    <button onclick="socket.send('pause')">pause</button>
-    <button onclick="socket.send('reset')">reset</button>
+<div class="container">
+    <div id="buttons">
+        <button class="btn btn-primary" onclick="socket.send('start')">start</button>
+        <button class="btn btn-secondary" onclick="socket.send('pause')">pause</button>
+        <button class="btn btn-warning" onclick="socket.send('reset')">reset</button>
+    </div>
+
+    <p>
+        <img class="blurry_image" src="/liveimage">
+    </p>
+    <p>
+        <video class="blurry_image" controls src="/lastrun.mp4"></video>
+    </p>
+    <div style="width: 100%" id="konva_canvas">k</div>
+    <script src="websocket.js"></script>
+    <script src="drawing.js"></script>
 </div>
-
-<img style="height: 30vh;" id="image" src="/liveimage">
-
-<video style="height: 30vh;" controls src="/lastrun.mp4"></video>
-
-<div id="konva_canvas">k</div>
-<script src="websocket.js"></script>
-<script src="drawing.js"></script>
-
 </body>
 </html>
