@@ -15,18 +15,17 @@
 
 <body>
 <div class="container">
+    <div>
+        <a href="/lastrun.mp4" target="_blank">Video vom letzten Durchlauf</a>
+    </div>
     <div id="buttons">
         <button class="btn btn-primary" onclick="socket.send('start')">start</button>
         <button class="btn btn-secondary" onclick="socket.send('pause')">pause</button>
         <button class="btn btn-warning" onclick="socket.send('reset')">reset</button>
     </div>
-
-    <p>
+    <div>
         <video class="blurry_image" id="janus_stream" autoplay></video>
-    </p>
-    <p>
-        <video class="blurry_image" controls src="/lastrun.mp4"></video>
-    </p>
+    </div>
     <div style="width: 100%" id="konva_canvas">k</div>
     <script src="websocket.js"></script>
     <script src="drawing.js"></script>
