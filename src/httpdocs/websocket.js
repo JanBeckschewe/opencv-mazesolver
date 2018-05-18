@@ -1,7 +1,7 @@
-var forward = 0, right = 1, backward = 2, left = 3;
-var fullPath = [];
-var simplePath = [];
-var socket;
+let forward = 0, right = 1, backward = 2, left = 3;
+let fullPath = [];
+let simplePath = [];
+let socket;
 
 function connect() {
     socket = new WebSocket('wss://' + window.location.hostname + '/ws');
@@ -11,7 +11,7 @@ function connect() {
     };
 
     socket.onmessage = function (ev) {
-        var message = JSON.parse(ev.data);
+        const message = JSON.parse(ev.data);
         fullPath = message.full_path;
         simplePath = message.simple_path;
         console.log(message);

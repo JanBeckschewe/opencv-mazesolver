@@ -1,41 +1,41 @@
-var konvaSimplePoints = [];
-var konvaFullPoints = [];
+const konvaSimplePoints = [];
+const konvaFullPoints = [];
 
-var stage = new Konva.Stage({
+const stage = new Konva.Stage({
     container: 'konva_canvas',
     width: window.innerWidth,
     height: window.innerHeight,
     draggable: true
 });
 
-var layer = new Konva.Layer({});
+const layer = new Konva.Layer({});
 stage.add(layer);
 
-var konvaFullPathLine = new Konva.Line({
+const konvaFullPathLine = new Konva.Line({
     points: konvaFullPoints,
     stroke: 'red',
     strokeWidth: 250,
     closed: false
 });
-var konvaSimplePathLine = new Konva.Line({
+const konvaSimplePathLine = new Konva.Line({
     points: konvaSimplePoints,
     stroke: 'green',
     strokeWidth: 150,
     closed: false
 });
-var konvaFullStartPoint = new Konva.Circle({
+const konvaFullStartPoint = new Konva.Circle({
     x: 0,
     y: 0,
     radius: 300,
     fill: 'blue'
 });
-var konvaFullEndPoint = new Konva.Circle({
+const konvaFullEndPoint = new Konva.Circle({
     x: 0,
     y: 0,
     radius: 300,
     fill: 'yellow'
 });
-var konvaSimpleEndPoint = new Konva.Circle({
+const konvaSimpleEndPoint = new Konva.Circle({
     x: 0,
     y: 0,
     radius: 300,
@@ -68,11 +68,11 @@ function draw() {
     konvaSimpleEndPoint.x(konvaSimplePoints[konvaSimplePoints.length - 2]);
     konvaSimpleEndPoint.y(konvaSimplePoints[konvaSimplePoints.length - 1]);
 
-    var pathBoundsRect = konvaFullPathLine.getClientRect();
+    const pathBoundsRect = konvaFullPathLine.getClientRect();
 
     layer.offset({x: pathBoundsRect.x, y: pathBoundsRect.y});
 
-    var scalingFactor = Math.min(
+    const scalingFactor = Math.min(
         stage.width() / pathBoundsRect.width,
         stage.height() / pathBoundsRect.height);
 
@@ -84,8 +84,8 @@ function draw() {
 function setLinePoints(path, konvaPoints) {
     konvaPoints.length = 0;
 
-    var currentDir = right;
-    var posPixel = {x: 0, y: 0};
+    let currentDir = right;
+    const posPixel = {x: 0, y: 0};
     konvaPoints.push(0, 0);
     path.forEach(function (element) {
         currentDir = (currentDir + element[0]) % 4;
