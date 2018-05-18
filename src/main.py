@@ -80,9 +80,9 @@ class MainClass:
                 started = True
 
     def store_image(self, img):
-        if self.total_frames % 6 == 0:
-            cv2.imwrite("httpdocs/img.png", img)
-        self.total_frames += 1
+        # if self.total_frames % 6 == 0:
+        #     cv2.imwrite("httpdocs/img.png", img)
+        # self.total_frames += 1
 
         self.ffmpeg_process.stdin.write(img.tostring())
 

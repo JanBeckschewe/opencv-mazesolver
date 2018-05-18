@@ -8,6 +8,9 @@
     <link rel="shortcut icon" href="favicon.png">
     <link rel="stylesheet" href="style.css">
     <script src="konva.min.js"></script>
+    <script src="adapter.js"></script>
+    <script src="janus.js"></script>
+    <script src="janus_streaming.js"></script>
 </head>
 
 <body>
@@ -19,7 +22,7 @@
     </div>
 
     <p>
-        <img class="blurry_image" src="/liveimage">
+        <video class="blurry_image" id="janus_stream" autoplay></video>
     </p>
     <p>
         <video class="blurry_image" controls src="/lastrun.mp4"></video>

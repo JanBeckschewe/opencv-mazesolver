@@ -1,6 +1,5 @@
+let streaming;
 document.addEventListener('DOMContentLoaded', () => {
-    let streaming;
-
     Janus.init({
         debug: true,
         dependencies: Janus.useDefaultDependencies(),
@@ -46,8 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         onremotestream: (stream) => {
                             console.log("onremotestream");
-                            Janus.attachMediaStream(document.getElementById("myvideo"), stream);
-                            document.getElementById("myvideo").focus();
+                            Janus.attachMediaStream(document.getElementById("janus_stream"), stream);
                         }
                     });
                 }
