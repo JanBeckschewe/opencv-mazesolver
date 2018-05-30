@@ -6,6 +6,7 @@ import linecalc
 
 class OpenCV:
     def __init__(self, maze, w, h):
+        self.lines_last_frames = []
         self.w = w
         self.h = h
         self.maze = maze
@@ -27,15 +28,26 @@ class OpenCV:
         lines = cv2.HoughLinesP(image=img_canny,
                                 rho=1,
                                 theta=np.pi / 180,
-                                threshold=20,
-                                minLineLength=30,
-                                maxLineGap=10)
+                                threshold=5,
+                                minLineLength=15,
+                                maxLineGap=5)
+
+        if lines is not None:
+            for line in lines:
+                self.lines_last_frames.append([total_processed_frames, line])
+
+        for line in self.lines_last_frames[:]:
+            if line[0] + 2 < total_processed_frames:
+                self.lines_last_frames.remove(line)
+
+        output_lines = []
+        for line in self.lines_last_frames:
+            output_lines.append(line[1])
 
         img_black_thres = cv2.inRange(img_sharpened, 0, 50)
-
         num_black_pixels = cv2.countNonZero(img_black_thres)
 
-        return cv2.cvtColor(img_sharpened, cv2.COLOR_GRAY2BGR), lines, num_black_pixels
+        return cv2.cvtColor(img_sharpened, cv2.COLOR_GRAY2BGR), output_lines, num_black_pixels
 
     def find_lines(self, img_canny, x1, y1, x2, y2, are_turns_seen_rn):
         # TODO we need to check the bottom part as well because

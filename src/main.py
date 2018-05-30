@@ -99,13 +99,12 @@ class MainClass:
             motor_steer = 0
 
             i = 0
-            if lines is not None:
-                for line in lines:
-                    for x1, y1, x2, y2 in line:
-                        average_line_position += ((x1 + x2) / 2 - average_line_position) / (i + 1)
-                        i += 1
+            for line in lines:
+                for x1, y1, x2, y2 in line:
+                    average_line_position += ((x1 + x2) / 2 - average_line_position) / (i + 1)
+                    i += 1
 
-                        self.opencv.find_lines(img_canny, x1, y1, x2, y2, are_turns_seen_rn)
+                    self.opencv.find_lines(img_canny, x1, y1, x2, y2, are_turns_seen_rn)
 
             # when reset from website
             if self.is_finished and len(self.maze.full_path) == 0:
@@ -122,7 +121,7 @@ class MainClass:
                     self.current_direction = self.maze.forward if opposite_direction == self.maze.forward else abs(
                         2 - opposite_direction)
 
-                if lines is None and self.current_direction == self.maze.forward:
+                if not lines and self.current_direction == self.maze.forward:
                     self.maze.add_turn(self.maze.backward)
                     self.current_direction = self.maze.backward
                     print("added_backward")
