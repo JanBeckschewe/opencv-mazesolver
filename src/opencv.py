@@ -13,7 +13,7 @@ class OpenCV:
         self.np_distortion_coefficients = np.array([-3.0048e-01, 8.4940e-02, -3.5780e-03, -2.08614e-03, -1.0185e-02])
         self.linecalc = linecalc.LineCalc(w, h)
 
-    def modify_image(self, frame):
+    def modify_image(self, frame, total_processed_frames):
         img = frame.array
         img = cv2.rotate(img, 1)
         img = cv2.undistort(img, self.np_camera_matrix, self.np_distortion_coefficients)
@@ -53,6 +53,7 @@ class OpenCV:
                 cv2.line(img_canny, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
         else:
+            cv2.line(img_canny, (x1, y1), (x2, y2), (255, 0, 255), 2)
             if self.linecalc.contains_line_bottom_left(x1, y1, x2, y2):
                 are_turns_seen_rn[self.maze.left] = True
                 # red

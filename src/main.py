@@ -29,7 +29,7 @@ class MainClass:
         self.pid = pid_from_github.PID(1, .05, .4)
         self.motors = motors.Motors()
 
-        self.total_frames = 0
+        self.total_processed_frames = 0
 
         self.is_first_run = True
         self.is_finished = False
@@ -86,10 +86,11 @@ class MainClass:
     def solve_maze(self):
         time_last_frame = time.time()
         while True:
+            self.total_processed_frames += 1
             print("solver:" + str(1 / (time.time() - time_last_frame)), end='\r')
             time_last_frame = time.time()
 
-            img_canny, lines, num_black_pixels = self.opencv.modify_image(self.frame)
+            img_canny, lines, num_black_pixels = self.opencv.modify_image(self.frame, self.total_processed_frames)
 
             average_line_position = self.w / 2
 

@@ -15,6 +15,8 @@ class SocketHandler(WebSocket):
             ws_server_obj.maze.is_paused = True
         elif self.data == "start":
             ws_server_obj.maze.is_paused = False
+        elif self.data == "back":
+            pass
         elif self.data == "reset":
             ws_server_obj.maze.reset()
             ws_server_obj.send_path()
