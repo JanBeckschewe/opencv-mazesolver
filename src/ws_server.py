@@ -10,11 +10,10 @@ ws_server_obj = None
 class SocketHandler(WebSocket):
 
     def handleMessage(self):
-        print('message rec')
         if self.data == "pause":
-            ws_server_obj.maze.is_paused = True
+            ws_server_obj.maze.pause()
         elif self.data == "start":
-            ws_server_obj.maze.is_paused = False
+            ws_server_obj.maze.unpause()
         elif self.data == "back":
             pass
         elif self.data == "reset":
