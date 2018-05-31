@@ -4,6 +4,10 @@
     /*overflow: hidden;*/
 /*}*/
 
+#stage-parent {
+    width: 100%;
+}
+
 /* Custom, iPhone Retina */
 @media only screen and (min-width: 320px) {
     .blurry_image {

@@ -3,8 +3,8 @@ const konvaFullPoints = [];
 
 const stage = new Konva.Stage({
     container: 'konva_canvas',
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: 1000,
+    height: 1000,
     draggable: true
 });
 
@@ -48,12 +48,6 @@ layer.add(konvaSimplePathLine);
 layer.add(konvaFullStartPoint);
 layer.add(konvaFullEndPoint);
 layer.add(konvaSimpleEndPoint);
-
-window.addEventListener('resize', function (ev) {
-    stage.width(window.innerWidth);
-    stage.height(window.innerHeight);
-    draw();
-});
 
 function draw() {
     layer.offset({x: 0, y: 0});
