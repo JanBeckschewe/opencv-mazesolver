@@ -6,6 +6,7 @@ import linecalc
 
 class OpenCV:
     def __init__(self, maze, w, h):
+        self.lines_last_frames = []
         self.w = w
         self.h = h
         self.maze = maze
@@ -37,29 +38,27 @@ class OpenCV:
 
         return cv2.cvtColor(img_sharpened, cv2.COLOR_GRAY2BGR), lines, num_black_pixels
 
-    def find_lines(self, img_canny, x1, y1, x2, y2, are_turns_seen_rn):
-        # TODO we need to check the bottom part as well because
-        # TODO otherwise it will e.g. go right although there
-        # TODO might be a left in the upper half of the image
+    def find_lines(self, img_canny, x1, y1, x2, y2, tmp_turns_seen_rn):
+
         if not self.linecalc.is_line_horizontal(x1, y1, x2, y2):
             if self.linecalc.contains_line_bottom(x1, y1, x2, y2):
-                are_turns_seen_rn[self.maze.backward] = True
+                tmp_turns_seen_rn[self.maze.backward] = True
                 # purple
                 cv2.line(img_canny, (x1, y1), (x2, y2), (85, 26, 139), 2)
 
             if self.linecalc.contains_line_top(x1, y1, x2, y2):
-                are_turns_seen_rn[self.maze.forward] = True
+                tmp_turns_seen_rn[self.maze.forward] = True
                 # green
                 cv2.line(img_canny, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
         else:
             cv2.line(img_canny, (x1, y1), (x2, y2), (255, 0, 255), 2)
-            if self.linecalc.contains_line_bottom_left(x1, y1, x2, y2):
-                are_turns_seen_rn[self.maze.left] = True
+            if self.linecalc.contains_line_left_area(x1, y1, x2, y2):
+                tmp_turns_seen_rn[self.maze.left] = True
                 # red
                 cv2.line(img_canny, (x1, y1), (x2, y2), (255, 0, 0), 2)
 
-            if self.linecalc.contains_line_bottom_right(x1, y1, x2, y2):
-                are_turns_seen_rn[self.maze.right] = True
+            if self.linecalc.contains_line_side_area(x1, y1, x2, y2):
+                tmp_turns_seen_rn[self.maze.right] = True
                 # blue
                 cv2.line(img_canny, (x1, y1), (x2, y2), (0, 0, 255), 2)

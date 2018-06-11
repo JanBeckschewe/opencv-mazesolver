@@ -24,6 +24,8 @@ class MainClass:
         self.raw_capture = PiRGBArray(self.camera, size=(self.w, self.h))
         self.frame = None
 
+        self.are_turns_seen_rn = [[False] * 4] * 3
+
         self.maze = maze.Maze()
         self.opencv = opencv.OpenCV(self.maze, self.w, self.h)
         self.pid = pid_from_github.PID(1, .05, .4)
@@ -73,7 +75,7 @@ class MainClass:
             self.frame = frame
             self.raw_capture.truncate(0)
 
-            print("camera:" + str(1 / (time.time() - time_last_frame)), end='\r')
+            # print("camera:" + str(1 / (time.time() - time_last_frame)), end='\r')
             time_last_frame = time.time()
 
             if not started:
@@ -83,29 +85,44 @@ class MainClass:
     def store_image(self, img):
         self.ffmpeg_process.stdin.write(img.tostring())
 
+    def check_turn_seen(self, turn_to_check):
+        times_turn_seen = 0
+        for turn in self.are_turns_seen_rn:
+            if turn[turn_to_check]:
+                times_turn_seen += 1
+        print("turn:" + self.maze.get_direction_string(turn_to_check) + ": " + ("True" if times_turn_seen >= 2 else "False"))
+        if self.total_processed_frames <= 4:
+            return times_turn_seen >= 1
+        else:
+            return times_turn_seen >= 2
+
     def solve_maze(self):
         time_last_frame = time.time()
         while True:
             self.total_processed_frames += 1
-            print("solver:" + str(1 / (time.time() - time_last_frame)), end='\r')
+            # print("solver:" + str(1 / (time.time() - time_last_frame)), end='\r')
             time_last_frame = time.time()
 
             img_canny, lines, num_black_pixels = self.opencv.modify_image(self.frame, self.total_processed_frames)
 
             average_line_position = self.w / 2
 
-            are_turns_seen_rn = [False] * 4
-
             motor_steer = 0
 
             i = 0
+
+            self.are_turns_seen_rn.pop(len(self.are_turns_seen_rn) - 1)
+            tmp_turns_seen_rn = [False] * 4
+
             if lines is not None:
                 for line in lines:
                     for x1, y1, x2, y2 in line:
                         average_line_position += ((x1 + x2) / 2 - average_line_position) / (i + 1)
                         i += 1
 
-                        self.opencv.find_lines(img_canny, x1, y1, x2, y2, are_turns_seen_rn)
+                        self.opencv.find_lines(img_canny, x1, y1, x2, y2, tmp_turns_seen_rn)
+
+            self.are_turns_seen_rn.insert(0, tmp_turns_seen_rn)
 
             # when reset from website
             if self.is_finished and len(self.maze.full_path) == 0:
@@ -128,9 +145,9 @@ class MainClass:
                     print("added_backward")
 
                 if self.current_direction == self.maze.backward:
-                    if are_turns_seen_rn[self.maze.forward] or are_turns_seen_rn[self.maze.backward]:
+                    if self.check_turn_seen(self.maze.forward) or self.check_turn_seen(self.maze.backward):
                         self.current_direction = self.maze.forward
-                    if are_turns_seen_rn[self.maze.left]:
+                    if self.check_turn_seen(self.maze.left):
                         self.is_in_backwards_left_turn = True
                 else:
                     self.is_in_backwards_left_turn = False
@@ -138,21 +155,21 @@ class MainClass:
                 if self.is_in_backwards_left_turn:
                     motor_steer = -2
 
-                if ((self.current_direction == self.maze.left and not are_turns_seen_rn[self.maze.left]) or (
-                        self.current_direction == self.maze.right and not are_turns_seen_rn[self.maze.right])) and (
-                        are_turns_seen_rn[self.maze.forward] or are_turns_seen_rn[self.maze.backward]):
+                if ((self.current_direction == self.maze.left and not self.check_turn_seen(self.maze.left)) or (
+                        self.current_direction == self.maze.right and not self.check_turn_seen(self.maze.right))) and (
+                        self.check_turn_seen(self.maze.forward) or self.check_turn_seen(self.maze.backward)):
                     self.current_direction = self.maze.forward
 
                 if self.current_direction == self.maze.forward:
-                    if are_turns_seen_rn[self.maze.left]:
+                    if self.check_turn_seen(self.maze.left):
                         new_turn = self.maze.left
                         print("added_left")
-                    elif are_turns_seen_rn[self.maze.forward] and are_turns_seen_rn[self.maze.right] \
+                    elif self.check_turn_seen(self.maze.forward) and self.check_turn_seen(self.maze.right) \
                             and not self.saw_right_turn_last_frame:
                         self.saw_right_turn_last_frame = True
                         new_turn = self.maze.forward
                         print("added_forward")
-                    elif are_turns_seen_rn[self.maze.right] and not are_turns_seen_rn[self.maze.forward]:
+                    elif self.check_turn_seen(self.maze.right) and not self.check_turn_seen(self.maze.forward):
                         new_turn = self.maze.right
                         print("added_right")
                     else:
@@ -165,7 +182,7 @@ class MainClass:
                         else:
                             self.maze.simple_path_position -= 1
 
-                if not are_turns_seen_rn[self.maze.right]:
+                if not self.check_turn_seen(self.maze.right):
                     self.saw_right_turn_last_frame = False
 
                 # main driving part
@@ -188,12 +205,12 @@ class MainClass:
                 else:
                     print("something went horrible")
 
-                self.motors.set_speed_from_speed_steer(.33, motor_steer)
+                self.motors.set_speed_from_speed_steer(.27, motor_steer)
             else:
                 self.motors.set_speed(0, 0)
 
-            cv2.putText(img_canny, 'directNr: ' + str(motor_steer), (5, 10), 0, .5, (0, 0, 255), 1, cv2.LINE_AA)
-            cv2.putText(img_canny, 'direction: ' + self.maze.get_direction_string(self.current_direction),
+            cv2.putText(img_canny, 'dir_PID: ' + str(motor_steer), (5, 10), 0, .5, (0, 0, 255), 1, cv2.LINE_AA)
+            cv2.putText(img_canny, 'dir: ' + self.maze.get_direction_string(self.current_direction),
                         (5, 30), 0, .5, (0, 0, 255), 1, cv2.LINE_AA)
 
             threading.Thread(target=self.store_image, args=(img_canny,)).start()
