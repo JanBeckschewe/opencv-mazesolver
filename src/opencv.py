@@ -53,12 +53,12 @@ class OpenCV:
 
         else:
             cv2.line(img_canny, (x1, y1), (x2, y2), (255, 0, 255), 2)
-            if self.linecalc.contains_line_bottom_left(x1, y1, x2, y2):
+            if self.linecalc.contains_line_left_area(x1, y1, x2, y2):
                 tmp_turns_seen_rn[self.maze.left] = True
                 # red
                 cv2.line(img_canny, (x1, y1), (x2, y2), (255, 0, 0), 2)
 
-            if self.linecalc.contains_line_bottom_right(x1, y1, x2, y2):
+            if self.linecalc.contains_line_side_area(x1, y1, x2, y2):
                 tmp_turns_seen_rn[self.maze.right] = True
                 # blue
                 cv2.line(img_canny, (x1, y1), (x2, y2), (0, 0, 255), 2)

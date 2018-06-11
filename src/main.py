@@ -85,16 +85,16 @@ class MainClass:
     def store_image(self, img):
         self.ffmpeg_process.stdin.write(img.tostring())
 
-    def check_turn_seen(self, turn):
-        number_turn_seen = 0
-        for turno in self.are_turns_seen_rn:
-            # print("turno:" + self.maze.get_direction_string(turn) + ": " + str(turno[turn]))
-            if turno[turn]:
-                number_turn_seen += 1
+    def check_turn_seen(self, turn_to_check):
+        times_turn_seen = 0
+        for turn in self.are_turns_seen_rn:
+            if turn[turn_to_check]:
+                times_turn_seen += 1
+        print("turn:" + self.maze.get_direction_string(turn_to_check) + ": " + ("True" if times_turn_seen >= 2 else "False"))
         if self.total_processed_frames <= 4:
-            return number_turn_seen >= 1
+            return times_turn_seen >= 1
         else:
-            return number_turn_seen >= 2
+            return times_turn_seen >= 2
 
     def solve_maze(self):
         time_last_frame = time.time()
@@ -205,12 +205,12 @@ class MainClass:
                 else:
                     print("something went horrible")
 
-                self.motors.set_speed_from_speed_steer(.33, motor_steer)
+                self.motors.set_speed_from_speed_steer(.27, motor_steer)
             else:
                 self.motors.set_speed(0, 0)
 
-            cv2.putText(img_canny, 'directionPID: ' + str(motor_steer), (5, 10), 0, .5, (0, 0, 255), 1, cv2.LINE_AA)
-            cv2.putText(img_canny, 'direction: ' + self.maze.get_direction_string(self.current_direction),
+            cv2.putText(img_canny, 'dir_PID: ' + str(motor_steer), (5, 10), 0, .5, (0, 0, 255), 1, cv2.LINE_AA)
+            cv2.putText(img_canny, 'dir: ' + self.maze.get_direction_string(self.current_direction),
                         (5, 30), 0, .5, (0, 0, 255), 1, cv2.LINE_AA)
 
             threading.Thread(target=self.store_image, args=(img_canny,)).start()
