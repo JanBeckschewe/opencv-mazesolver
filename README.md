@@ -12,12 +12,12 @@ We have also build a website for it where you can see the current camera image a
 #### Install these dependencies:
 - python3
 - opencv
-- pyyaml
 - nginx
 - simple-websocket-server
 - rpi.gpio
 - picamera
-- mjpg-streamer
+- ffmpeg
+- janus
 #### Setup
 - move all the ```*.service``` files from ```scripts+services``` to ```/etc/systemd/systemd/```
 - enable them wih ```sudo systemctl enable mazesolver autohotspot httpopencvstreamer```
